@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --surface: 0 0% 100%;
+    --surface-elevated: 0 0% 98%;
+    --border: 214 32% 91%;
+    --border-strong: 214 32% 80%;
+  }
+
+  .dark {
+    --surface: 240 10% 4%;
+    --surface-elevated: 240 8% 10%;
+    --border: 240 5% 18%;
+    --border-strong: 240 5% 26%;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-gray-950 text-gray-50 antialiased;
+    font-feature-settings: 'tnum' 1;
+  }
+}
