@@ -26,4 +26,12 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'error',
   },
   ignorePatterns: ['dist', 'node_modules', 'styled-system', '*.config.js', '*.config.cjs'],
+  overrides: [
+    {
+      // Config and setup files are not part of any TS project — disable type-aware rules
+      files: ['*.config.ts', 'vitest.setup.ts'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      parserOptions: { project: null },
+    },
+  ],
 };

@@ -9,6 +9,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     include: ['apps/**/*.test.{ts,tsx}', 'packages/**/*.test.{ts,tsx}'],
+    passWithNoTests: true,
     alias: {
       '@fluxora/ui': resolve(__dirname, 'packages/ui/src'),
       '@fluxora/data': resolve(__dirname, 'packages/data/src'),
