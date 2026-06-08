@@ -25,12 +25,12 @@ module.exports = {
     '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
     '@typescript-eslint/no-non-null-assertion': 'error',
   },
-  ignorePatterns: ['dist', 'node_modules', 'styled-system', '*.config.js', '*.config.cjs'],
+  ignorePatterns: ['dist', 'node_modules', 'styled-system', '*.config.js', '*.config.cjs', '.eslintrc.js'],
   overrides: [
     {
-      // Config and setup files are not part of any TS project — disable type-aware rules
+      // Config and setup files are not part of any TS project — disable all type-aware rules
       files: ['*.config.ts', 'vitest.setup.ts'],
-      extends: ['plugin:@typescript-eslint/recommended'],
+      extends: ['plugin:@typescript-eslint/disable-type-checked'],
       parserOptions: { project: null },
     },
   ],
