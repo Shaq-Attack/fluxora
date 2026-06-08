@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@fluxora/ui": ["../../packages/ui/src"],
+      "@fluxora/ui/*": ["../../packages/ui/src/*"],
+      "@fluxora/data": ["../../packages/data/src"],
+      "@fluxora/data/*": ["../../packages/data/src/*"],
+      "@fluxora/worker": ["../../packages/worker/src"],
+      "@fluxora/worker/*": ["../../packages/worker/src/*"],
+      "@fluxora/types": ["../../packages/types/src"],
+      "@fluxora/types/*": ["../../packages/types/src/*"],
+      "@fluxora/charts": ["../../packages/charts/src"],
+      "@fluxora/charts/*": ["../../packages/charts/src/*"]
+    },
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../packages/types" },
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/data" },
+    { "path": "../../packages/worker" },
+    { "path": "../../packages/charts" }
+  ]
+}

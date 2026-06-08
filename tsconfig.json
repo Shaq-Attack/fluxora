@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/types" },
+    { "path": "packages/ui" },
+    { "path": "packages/data" },
+    { "path": "packages/worker" },
+    { "path": "packages/charts" },
+    { "path": "apps/web" }
+  ]
+}
