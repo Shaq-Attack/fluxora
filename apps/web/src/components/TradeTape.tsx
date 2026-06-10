@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Trade } from '@fluxora/types';
-import { formatPrice } from '../lib/format';
+import { formatPrice, formatTime, formatQuantity } from '../lib/format';
 import { useMarketStore } from '../store/marketStore';
 
 interface TradeTapeProps {
@@ -10,19 +10,6 @@ interface TradeTapeProps {
 
 const ROW_HEIGHT = 28;
 const EMPTY_TRADES: Trade[] = [];
-
-function formatTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleTimeString('en-US', {
-    hour12: false,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-}
-
-function formatQuantity(qty: number): string {
-  return qty.toFixed(6);
-}
 
 function TradeRow({ trade }: { trade: Trade }): JSX.Element {
   const colourClass = trade.side === 'sell' ? 'text-red-400' : 'text-green-400';
