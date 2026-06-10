@@ -38,11 +38,12 @@ export function useCandlestickChart({
     if (!container) return;
 
     const chart = createChart(container, {
+      autoSize: true,
+      height: 300,
+      width: 400,
       layout: { background: { color: '#030712' }, textColor: '#9ca3af' },
       grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
       timeScale: { timeVisible: true, secondsVisible: false },
-      width: container.clientWidth,
-      height: container.clientHeight,
     });
 
     const series = chart.addCandlestickSeries({
@@ -57,21 +58,11 @@ export function useCandlestickChart({
     chartRef.current = chart;
     seriesRef.current = series;
 
-    const resizeObserver = new ResizeObserver(() => {
-      chart.applyOptions({
-        width: container.clientWidth,
-        height: container.clientHeight,
-      });
-    });
-    resizeObserver.observe(container);
-
     return () => {
-      resizeObserver.disconnect();
       chart.remove();
       chartRef.current = null;
       seriesRef.current = null;
     };
-    // containerRef is stable (from useRef in the component); runs once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
