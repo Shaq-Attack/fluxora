@@ -1,10 +1,6 @@
 import { z } from 'zod';
 import type { OrderBook } from '@fluxora/types';
-
-const SYMBOL_TO_PAIR: Record<string, string> = {
-  'BTC/USD': 'XBTUSD',
-  'ETH/USD': 'ETHUSD',
-};
+import { SYMBOL_TO_PAIR } from './constants';
 
 const restLevelSchema = z.tuple([z.string(), z.string(), z.number()]);
 
