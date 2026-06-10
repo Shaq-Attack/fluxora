@@ -1,6 +1,7 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useKrakenFeed } from '@fluxora/data';
 import { ConnectionBadge } from './components/ConnectionBadge';
+import { OrderBookPanel } from './components/OrderBookPanel';
 import { TickerPanel } from './components/TickerPanel';
 import { TradeTape } from './components/TradeTape';
 import { useMarketStore } from './store/marketStore';
@@ -33,6 +34,7 @@ function App(): JSX.Element {
           <div key={symbol} className="flex flex-col gap-4">
             <TickerPanel symbol={symbol} />
             <TradeTape symbol={symbol} />
+            <OrderBookPanel symbol={symbol} />
           </div>
         ))}
       </main>
