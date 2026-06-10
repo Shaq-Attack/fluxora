@@ -8,7 +8,7 @@ import { fetchKrakenDepthSnapshot } from '../kraken/restDepth';
 export interface UseKrakenOrderBookOptions {
   symbol: string;
   depth: number;
-  worker: Worker;
+  createWorker: () => Worker;
   onOrderBook: (ob: OrderBook) => void;
   onStatusChange: (status: ConnectionStatus) => void;
 }
@@ -19,7 +19,8 @@ export function useKrakenOrderBook(options: UseKrakenOrderBookOptions): void {
 
   useEffect(() => {
     let cancelled = false;
-    const { symbol, depth, worker } = optionsRef.current;
+    const { symbol, depth, createWorker } = optionsRef.current;
+    const worker = createWorker();
 
     const subscribeMsg: WorkerInboundMessage = {
       type: 'SUBSCRIBE',
@@ -105,8 +106,9 @@ export function useKrakenOrderBook(options: UseKrakenOrderBookOptions): void {
       cancelled = true;
       connection.disconnect();
       worker.onmessage = null;
+      worker.terminate();
     };
-    // connection and worker are created once per mount; callbacks proxied via ref
+    // worker, connection created once per mount; callbacks proxied via ref
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
