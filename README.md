@@ -42,3 +42,7 @@ packages/
 ## Capabilities
 
 - Monorepo scaffold with pnpm workspaces and TypeScript project references
+- **Live market data dashboard** — streams BTC/USD and ETH/USD in real time from Kraken WebSocket v2
+  - Ticker panel: best bid, best ask, and last price with sub-200 ms updates
+  - Trade tape: live matched orders with timestamp, price, size, and side colouring (green buy / red sell), virtualised via `@tanstack/react-virtual` for high throughput
+  - Connection badge: visible Live / Connecting / Disconnected indicator with exponential-backoff auto-reconnect

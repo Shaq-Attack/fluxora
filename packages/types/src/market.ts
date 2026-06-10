@@ -3,6 +3,8 @@ import type { Exchange } from './exchange';
 export interface Ticker {
   symbol: string;
   exchange: Exchange;
+  bid: number;
+  ask: number;
   price: number;
   volume24h: number;
   change24h: number;

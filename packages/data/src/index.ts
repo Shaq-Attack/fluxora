@@ -1,2 +1,2 @@
-// Exchange adapter hooks and WebSocket client — populated as features are implemented
-export {};
+export { useKrakenFeed } from './hooks/useKrakenFeed';
+export type { UseKrakenFeedOptions } from './hooks/useKrakenFeed';

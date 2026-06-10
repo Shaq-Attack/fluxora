@@ -1,11 +1,40 @@
+import { useShallow } from 'zustand/react/shallow';
+import { useKrakenFeed } from '@fluxora/data';
+import { ConnectionBadge } from './components/ConnectionBadge';
+import { TickerPanel } from './components/TickerPanel';
+import { TradeTape } from './components/TradeTape';
+import { useMarketStore } from './store/marketStore';
+
+const SYMBOLS = ['BTC/USD', 'ETH/USD'] as const;
+
 function App(): JSX.Element {
+  const { setTickers, addTrades, setConnectionStatus } = useMarketStore(
+    useShallow((s) => ({
+      setTickers: s.setTickers,
+      addTrades: s.addTrades,
+      setConnectionStatus: s.setConnectionStatus,
+    })),
+  );
+
+  useKrakenFeed({
+    onTicker: setTickers,
+    onTrade: addTrades,
+    onStatusChange: setConnectionStatus,
+  });
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <header className="border-b border-gray-800 px-4 py-3">
+      <header className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
         <h1 className="text-lg font-semibold tracking-tight">Fluxora</h1>
+        <ConnectionBadge />
       </header>
-      <main className="p-4">
-        <p className="text-sm text-gray-400">Dashboard coming soon.</p>
+      <main className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
+        {SYMBOLS.map((symbol) => (
+          <div key={symbol} className="flex flex-col gap-4">
+            <TickerPanel symbol={symbol} />
+            <TradeTape symbol={symbol} />
+          </div>
+        ))}
       </main>
     </div>
   );
