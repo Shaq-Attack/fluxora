@@ -1,36 +1,25 @@
-import { EXCHANGE_CONFIGS } from '@fluxora/types';
-import type { ConnectionStatus } from '@fluxora/types';
-
-const SYMBOLS = ['BTC/USD', 'ETH/USD'] as const;
-
-const SUBSCRIBE_TICKER = JSON.stringify({
-  method: 'subscribe',
-  params: { channel: 'ticker', symbol: [...SYMBOLS] },
-});
-
-const SUBSCRIBE_TRADE = JSON.stringify({
-  method: 'subscribe',
-  params: { channel: 'trade', symbol: [...SYMBOLS] },
-});
+import { EXCHANGE_CONFIGS, type ConnectionStatus } from '@fluxora/types';
 
 const INITIAL_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 30_000;
 const JITTER_FACTOR = 0.2;
 
-export interface KrakenConnectionOptions {
+export interface KrakenBookConnectionOptions {
+  symbol: string;
+  depth: number;
   onMessage: (raw: string) => void;
   onStatusChange: (status: ConnectionStatus) => void;
 }
 
-export class KrakenConnection {
+export class KrakenBookConnection {
   private ws: WebSocket | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private backoffMs = INITIAL_BACKOFF_MS;
   private stopped = false;
   private lastStatus: ConnectionStatus | null = null;
-  private readonly options: KrakenConnectionOptions;
+  private readonly options: KrakenBookConnectionOptions;
 
-  constructor(options: KrakenConnectionOptions) {
+  constructor(options: KrakenBookConnectionOptions) {
     this.options = options;
   }
 
@@ -77,11 +66,19 @@ export class KrakenConnection {
     const ws = new WebSocket(EXCHANGE_CONFIGS.kraken.wsEndpoint);
     this.ws = ws;
 
+    const subscribeMsg = JSON.stringify({
+      method: 'subscribe',
+      params: {
+        channel: 'book',
+        symbol: [this.options.symbol],
+        depth: this.options.depth,
+      },
+    });
+
     ws.onopen = () => {
       this.backoffMs = INITIAL_BACKOFF_MS;
       this.emitStatus('connected');
-      ws.send(SUBSCRIBE_TICKER);
-      ws.send(SUBSCRIBE_TRADE);
+      ws.send(subscribeMsg);
     };
 
     ws.onmessage = (event: MessageEvent<unknown>) => {
@@ -95,7 +92,7 @@ export class KrakenConnection {
     };
 
     ws.onclose = () => {
-      // Guard prevents a stale onclose from wiping a replacement socket created by a second openSocket() call.
+      // Guard prevents a stale onclose from wiping a replacement socket.
       if (this.ws === ws) this.ws = null;
       if (!this.stopped) {
         this.emitStatus('disconnected');
