@@ -7,7 +7,6 @@ interface MarketState {
   tickers: Record<string, Ticker | undefined>;
   trades: Record<string, Trade[] | undefined>;
   connectionStatus: ConnectionStatus;
-  setTicker: (ticker: Ticker) => void;
   setTickers: (tickers: Ticker[]) => void;
   addTrades: (trades: Trade[]) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
@@ -17,10 +16,6 @@ export const useMarketStore = create<MarketState>()((set) => ({
   tickers: {},
   trades: {},
   connectionStatus: 'disconnected',
-  setTicker: (ticker) =>
-    set((state) => ({
-      tickers: { ...state.tickers, [ticker.symbol]: ticker },
-    })),
   setTickers: (incoming) =>
     set((state) => {
       if (incoming.length === 0) return state;
