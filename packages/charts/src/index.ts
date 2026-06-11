@@ -1,2 +1,2 @@
-// Chart component wrappers — populated as features are implemented
-export {};
+export { CandlestickChart } from './CandlestickChart';
+export type { CandlestickChartProps } from './CandlestickChart';

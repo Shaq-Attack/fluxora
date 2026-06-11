@@ -51,3 +51,8 @@ packages/
   - Cumulative depth bars on each row showing relative liquidity at a glance
   - Backed by an off-thread Web Worker that processes snapshots and incremental deltas
   - CRC32 checksum validation (Kraken spec) and sequence-gap detection, with automatic REST re-sync on mismatch
+- **Live candlestick chart** — 1-minute OHLC chart per symbol powered by TradingView Lightweight Charts
+  - 200+ historical bars fetched from Kraken REST on mount (cached 60 s via TanStack Query)
+  - In-progress and completed bars stream in real time from the Kraken `ohlc` WebSocket channel
+  - Partial (in-progress) candle updates correctly update the last bar rather than appending a duplicate
+  - Supports zoom and pan; current price tracked on the price scale
