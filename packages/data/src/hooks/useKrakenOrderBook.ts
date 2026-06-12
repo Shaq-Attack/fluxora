@@ -3,6 +3,7 @@ import type { ConnectionStatus, OrderBook } from '@fluxora/types';
 import type { WorkerInboundMessage, WorkerOutboundMessage } from '@fluxora/worker';
 import { KrakenBookConnection } from '../kraken/bookConnection';
 import { parseKrakenBookMessage } from '../kraken/bookParser';
+import { KRAKEN_CHECKSUM_PRECISION } from '../kraken/constants';
 import { fetchKrakenDepthSnapshot } from '../kraken/restDepth';
 
 export interface UseKrakenOrderBookOptions {
@@ -22,10 +23,13 @@ export function useKrakenOrderBook(options: UseKrakenOrderBookOptions): void {
     const { symbol, depth, createWorker } = optionsRef.current;
     const worker = createWorker();
 
+    const checksumPrecision = KRAKEN_CHECKSUM_PRECISION[symbol];
     const subscribeMsg: WorkerInboundMessage = {
       type: 'SUBSCRIBE',
       symbol,
       exchange: 'kraken',
+      depth,
+      ...(checksumPrecision !== undefined ? { checksumPrecision } : {}),
     };
     worker.postMessage(subscribeMsg);
 
@@ -56,6 +60,9 @@ export function useKrakenOrderBook(options: UseKrakenOrderBookOptions): void {
         case 'CHECKSUM_MISMATCH':
         case 'SEQUENCE_GAP':
           handleResync();
+          break;
+        case 'ERROR':
+          console.error('[useKrakenOrderBook] worker error:', msg.message);
           break;
       }
     };

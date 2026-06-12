@@ -1,7 +1,16 @@
 import type { Exchange, OrderBook } from '@fluxora/types';
+import type { ChecksumPrecision } from './crc32';
 
 export type WorkerInboundMessage =
-  | { type: 'SUBSCRIBE'; symbol: string; exchange: Exchange }
+  | {
+      type: 'SUBSCRIBE';
+      symbol: string;
+      exchange: Exchange;
+      /** Levels to retain per side; the book is truncated to this after each delta. */
+      depth?: number;
+      /** Required to validate exchange checksums; validation is skipped when absent. */
+      checksumPrecision?: ChecksumPrecision;
+    }
   | { type: 'UNSUBSCRIBE'; symbol: string; exchange: Exchange }
   | {
       type: 'SNAPSHOT';
