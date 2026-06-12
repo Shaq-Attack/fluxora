@@ -16,23 +16,7 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
     );
   }
 
-  const top10Bids = orderBook.bids.slice(0, 10);
-  const top10Asks = orderBook.asks.slice(0, 10);
-
-  const totalBidQty = top10Bids.reduce((sum, l) => sum + l.quantity, 0);
-  const totalAskQty = top10Asks.reduce((sum, l) => sum + l.quantity, 0);
-
-  let cumBid = 0;
-  const bidsWithDepth = top10Bids.map((level) => {
-    cumBid += level.quantity;
-    return { ...level, depthPct: totalBidQty > 0 ? (cumBid / totalBidQty) * 100 : 0 };
-  });
-
-  let cumAsk = 0;
-  const asksWithDepth = top10Asks.map((level) => {
-    cumAsk += level.quantity;
-    return { ...level, depthPct: totalAskQty > 0 ? (cumAsk / totalAskQty) * 100 : 0 };
-  });
+  const { bids: bidsWithDepth, asks: asksWithDepth } = orderBook;
 
   return (
     <div className="rounded-lg border border-gray-800 bg-gray-900">

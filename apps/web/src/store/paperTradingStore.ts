@@ -143,12 +143,20 @@ export const usePaperTradingStore = create<PaperTradingState>()(
 
         for (const order of toFill) {
           if (order.limitPrice === undefined) continue;
+          // Re-validate at fill time: funds/holdings may have changed since
+          // submission — skip (keep pending) rather than go negative
+          if (order.side === 'buy' && core.cashBalance < order.qty * order.limitPrice) continue;
+          if (order.side === 'sell' && (core.positions[order.symbol]?.qty ?? 0) < order.qty) {
+            continue;
+          }
           const result = computeFill(core, order, order.limitPrice);
           core = result.core;
           newlyFilled.push(result.filledOrder);
         }
 
-        const filledIds = new Set(toFill.map((o) => o.id));
+        if (newlyFilled.length === 0) return;
+
+        const filledIds = new Set(newlyFilled.map((o) => o.id));
         set({
           ...core,
           pendingOrders: pendingOrders.filter((o) => !filledIds.has(o.id)),

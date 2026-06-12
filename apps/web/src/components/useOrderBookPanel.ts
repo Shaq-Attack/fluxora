@@ -1,8 +1,34 @@
+import { useMemo } from 'react';
 import { useKrakenOrderBook } from '@fluxora/data';
-import type { OrderBook } from '@fluxora/types';
+import type { OrderBookLevel } from '@fluxora/types';
 import { useOrderBookStore } from '../store/orderBookStore';
 
-export function useOrderBookPanel(symbol: string): OrderBook | undefined {
+const VISIBLE_LEVELS = 10;
+
+export interface DepthLevel extends OrderBookLevel {
+  /** Cumulative depth share of the visible levels, 0–100, for the background bar. */
+  depthPct: number;
+}
+
+export interface OrderBookPanelData {
+  bids: DepthLevel[];
+  asks: DepthLevel[];
+}
+
+function withCumulativeDepth(levels: OrderBookLevel[]): DepthLevel[] {
+  const visibleLevels = levels.slice(0, VISIBLE_LEVELS);
+  const totalQuantity = visibleLevels.reduce((sum, level) => sum + level.quantity, 0);
+  let cumulativeQuantity = 0;
+  return visibleLevels.map((level) => {
+    cumulativeQuantity += level.quantity;
+    return {
+      ...level,
+      depthPct: totalQuantity > 0 ? (cumulativeQuantity / totalQuantity) * 100 : 0,
+    };
+  });
+}
+
+export function useOrderBookPanel(symbol: string): OrderBookPanelData | undefined {
   const setOrderBook = useOrderBookStore((s) => s.setOrderBook);
 
   useKrakenOrderBook({
@@ -14,5 +40,13 @@ export function useOrderBookPanel(symbol: string): OrderBook | undefined {
     onStatusChange: () => undefined,
   });
 
-  return useOrderBookStore((s) => s.orderBooks[symbol]);
+  const orderBook = useOrderBookStore((s) => s.orderBooks[symbol]);
+
+  return useMemo(() => {
+    if (orderBook === undefined) return undefined;
+    return {
+      bids: withCumulativeDepth(orderBook.bids),
+      asks: withCumulativeDepth(orderBook.asks),
+    };
+  }, [orderBook]);
 }

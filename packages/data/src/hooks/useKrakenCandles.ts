@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import type { Candle, Timeframe } from '@fluxora/types';
 import { KrakenOhlcConnection } from '../kraken/ohlcConnection';
 import { parseKrakenOhlcMessage } from '../kraken/ohlcParser';
@@ -8,7 +8,7 @@ import { TIMEFRAME_TO_INTERVAL } from '../kraken/constants';
 
 const candleKeys = {
   history: (symbol: string, timeframe: Timeframe) =>
-    ['kraken', 'candles', symbol, timeframe] as const,
+    ['kraken', symbol, 'candles', timeframe] as const,
 };
 
 export interface UseKrakenCandlesOptions {
@@ -20,16 +20,19 @@ export interface UseKrakenCandlesResult {
   historicalCandles: Candle[];
   streamCandle: Candle | undefined;
   isLoading: boolean;
+  error: Error | null;
+  isError: boolean;
 }
 
 export function useKrakenCandles({
   symbol,
   timeframe,
 }: UseKrakenCandlesOptions): UseKrakenCandlesResult {
-  const { data: historicalCandles = [], isLoading } = useQuery({
+  const { data: historicalCandles = [], isLoading, error, isError } = useQuery({
     queryKey: candleKeys.history(symbol, timeframe),
     queryFn: () => fetchKrakenCandles(symbol, timeframe),
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 
   const [streamCandle, setStreamCandle] = useState<Candle | undefined>(undefined);
@@ -74,5 +77,5 @@ export function useKrakenCandles({
 
   // REST history takes precedence over WS snapshot fallback once it loads
   const effectiveHistorical = historicalCandles.length > 0 ? historicalCandles : snapshotCandles;
-  return { historicalCandles: effectiveHistorical, streamCandle, isLoading };
+  return { historicalCandles: effectiveHistorical, streamCandle, isLoading, error, isError };
 }

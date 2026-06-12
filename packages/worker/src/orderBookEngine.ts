@@ -1,6 +1,7 @@
 import type { OrderBook, Exchange } from '@fluxora/types';
 import type { WorkerInboundMessage, WorkerOutboundMessage } from './messages';
 import { computeKrakenChecksum } from './crc32';
+import type { ChecksumPrecision } from './crc32';
 
 interface EngineLevel {
   price: number;
@@ -13,7 +14,12 @@ interface BookEntry {
   sequenceId: number | null;
 }
 
-const books = new Map<string, BookEntry>();
+interface BookConfig {
+  depth: number;
+  checksumPrecision: ChecksumPrecision | null;
+}
+
+const DEFAULT_DEPTH = 25;
 
 function applyDelta(levels: EngineLevel[], deltas: [number, number][]): EngineLevel[] {
   const result = [...levels];
@@ -30,90 +36,126 @@ function applyDelta(levels: EngineLevel[], deltas: [number, number][]): EngineLe
   return result;
 }
 
-function postOrderBookUpdate(symbol: string, exchange: Exchange, entry: BookEntry): void {
-  const bids = entry.bids.slice(0, 25).map((l) => ({ price: l.price, quantity: l.quantity }));
-  const asks = entry.asks.slice(0, 25).map((l) => ({ price: l.price, quantity: l.quantity }));
-  const payload: OrderBook = {
-    symbol,
-    exchange,
-    bids,
-    asks,
-    timestamp: Date.now(),
-    ...(entry.sequenceId !== null ? { sequenceId: entry.sequenceId } : {}),
-  };
-  const msg: WorkerOutboundMessage = { type: 'ORDER_BOOK_UPDATE', payload };
-  self.postMessage(msg);
+export interface OrderBookEngine {
+  handleMessage: (msg: WorkerInboundMessage) => void;
 }
 
-self.onmessage = (event: MessageEvent): void => {
-  const msg = event.data as WorkerInboundMessage;
-  switch (msg.type) {
-    case 'SUBSCRIBE': {
-      const key = `${msg.symbol}:${msg.exchange}`;
-      if (!books.has(key)) {
-        books.set(key, { bids: [], asks: [], sequenceId: null });
-      }
-      break;
-    }
-    case 'UNSUBSCRIBE': {
-      books.delete(`${msg.symbol}:${msg.exchange}`);
-      break;
-    }
-    case 'SNAPSHOT': {
-      const entry: BookEntry = {
-        bids: [...msg.payload.bids].sort((a, b) => b.price - a.price),
-        asks: [...msg.payload.asks].sort((a, b) => a.price - b.price),
-        sequenceId: msg.payload.sequenceId ?? null,
-      };
-      books.set(`${msg.symbol}:${msg.exchange}`, entry);
-      postOrderBookUpdate(msg.symbol, msg.exchange, entry);
-      break;
-    }
-    case 'DELTA': {
-      const key = `${msg.symbol}:${msg.exchange}`;
-      const entry = books.get(key);
-      if (entry === undefined) break;
+export function createOrderBookEngine(
+  post: (msg: WorkerOutboundMessage) => void,
+): OrderBookEngine {
+  const books = new Map<string, BookEntry>();
+  const configs = new Map<string, BookConfig>();
 
-      const { payload } = msg;
+  function configFor(key: string): BookConfig {
+    return configs.get(key) ?? { depth: DEFAULT_DEPTH, checksumPrecision: null };
+  }
 
-      if (payload.sequenceId !== undefined && entry.sequenceId !== null) {
-        if (payload.sequenceId !== entry.sequenceId + 1) {
-          const gapMsg: WorkerOutboundMessage = {
-            type: 'SEQUENCE_GAP',
-            symbol: msg.symbol,
-            exchange: msg.exchange,
-            expected: entry.sequenceId + 1,
-            received: payload.sequenceId,
-          };
-          self.postMessage(gapMsg);
-          break;
+  function postOrderBookUpdate(
+    symbol: string,
+    exchange: Exchange,
+    entry: BookEntry,
+    depth: number,
+  ): void {
+    const bids = entry.bids.slice(0, depth).map((l) => ({ price: l.price, quantity: l.quantity }));
+    const asks = entry.asks.slice(0, depth).map((l) => ({ price: l.price, quantity: l.quantity }));
+    const payload: OrderBook = {
+      symbol,
+      exchange,
+      bids,
+      asks,
+      timestamp: Date.now(),
+      ...(entry.sequenceId !== null ? { sequenceId: entry.sequenceId } : {}),
+    };
+    post({ type: 'ORDER_BOOK_UPDATE', payload });
+  }
+
+  function handleMessage(msg: WorkerInboundMessage): void {
+    switch (msg.type) {
+      case 'SUBSCRIBE': {
+        const key = `${msg.symbol}:${msg.exchange}`;
+        configs.set(key, {
+          depth: msg.depth ?? DEFAULT_DEPTH,
+          checksumPrecision: msg.checksumPrecision ?? null,
+        });
+        if (!books.has(key)) {
+          books.set(key, { bids: [], asks: [], sequenceId: null });
         }
+        break;
       }
-
-      entry.bids = applyDelta(entry.bids, payload.bids);
-      entry.asks = applyDelta(entry.asks, payload.asks);
-      entry.bids.sort((a, b) => b.price - a.price);
-      entry.asks.sort((a, b) => a.price - b.price);
-
-      if (payload.sequenceId !== undefined) {
-        entry.sequenceId = payload.sequenceId;
+      case 'UNSUBSCRIBE': {
+        const key = `${msg.symbol}:${msg.exchange}`;
+        books.delete(key);
+        configs.delete(key);
+        break;
       }
+      case 'SNAPSHOT': {
+        const key = `${msg.symbol}:${msg.exchange}`;
+        const { depth } = configFor(key);
+        const entry: BookEntry = {
+          bids: [...msg.payload.bids].sort((a, b) => b.price - a.price),
+          asks: [...msg.payload.asks].sort((a, b) => a.price - b.price),
+          sequenceId: msg.payload.sequenceId ?? null,
+        };
+        books.set(key, entry);
+        postOrderBookUpdate(msg.symbol, msg.exchange, entry, depth);
+        break;
+      }
+      case 'DELTA': {
+        const key = `${msg.symbol}:${msg.exchange}`;
+        const entry = books.get(key);
+        if (entry === undefined) break;
 
-      if (payload.checksum !== undefined) {
-        const computed = computeKrakenChecksum(entry.bids, entry.asks);
-        if (computed !== payload.checksum) {
-          const mismatchMsg: WorkerOutboundMessage = {
-            type: 'CHECKSUM_MISMATCH',
-            symbol: msg.symbol,
-            exchange: msg.exchange,
-          };
-          self.postMessage(mismatchMsg);
-          break;
+        const { depth, checksumPrecision } = configFor(key);
+        const { payload } = msg;
+
+        if (payload.sequenceId !== undefined && entry.sequenceId !== null) {
+          if (payload.sequenceId !== entry.sequenceId + 1) {
+            post({
+              type: 'SEQUENCE_GAP',
+              symbol: msg.symbol,
+              exchange: msg.exchange,
+              expected: entry.sequenceId + 1,
+              received: payload.sequenceId,
+            });
+            break;
+          }
         }
-      }
 
-      postOrderBookUpdate(msg.symbol, msg.exchange, entry);
-      break;
+        entry.bids = applyDelta(entry.bids, payload.bids);
+        entry.asks = applyDelta(entry.asks, payload.asks);
+        entry.bids.sort((a, b) => b.price - a.price);
+        entry.asks.sort((a, b) => a.price - b.price);
+        // Kraken does not send removals for levels pushed beyond the subscribed
+        // depth — truncate, or stale levels resurface and corrupt the checksum
+        entry.bids = entry.bids.slice(0, depth);
+        entry.asks = entry.asks.slice(0, depth);
+
+        if (payload.sequenceId !== undefined) {
+          entry.sequenceId = payload.sequenceId;
+        }
+
+        if (payload.checksum !== undefined && checksumPrecision !== null) {
+          const computed = computeKrakenChecksum(entry.bids, entry.asks, checksumPrecision);
+          if (computed !== payload.checksum) {
+            post({ type: 'CHECKSUM_MISMATCH', symbol: msg.symbol, exchange: msg.exchange });
+            break;
+          }
+        }
+
+        postOrderBookUpdate(msg.symbol, msg.exchange, entry, depth);
+        break;
+      }
     }
   }
-};
+
+  return { handleMessage };
+}
+
+// Wire the engine to the dedicated-worker scope. Skipped when a window exists
+// (jsdom/unit tests import this module outside a worker).
+if (typeof self !== 'undefined' && !('window' in globalThis)) {
+  const engine = createOrderBookEngine((msg) => self.postMessage(msg));
+  self.onmessage = (event: MessageEvent): void => {
+    engine.handleMessage(event.data as WorkerInboundMessage);
+  };
+}

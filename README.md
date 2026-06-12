@@ -61,3 +61,9 @@ packages/
   - Limit orders stored as pending and auto-executed when the live market price crosses the limit price
   - Portfolio panel: cash balance, per-symbol holdings with average entry price, current value, and unrealised PnL updated in real time as prices change
   - Starting paper balance: $10,000 USD; portfolio state persisted across page reloads via `localStorage`
+- **Data caching layer** — all REST calls go through a shared TanStack Query client
+  - `QueryClient` configured with `staleTime: 10 s`, `retry: 2`, and `refetchOnWindowFocus: false`
+  - Typed query hooks for all three Kraken REST domains: candles (`useKrakenCandles`), ticker snapshot (`useKrakenTickerSnapshot`), and order-book depth snapshot (`useKrakenDepthSnapshot`)
+  - Query key convention `[exchange, symbol, dataType, ...extras]` enforced across all hooks
+  - Previous data served instantly on symbol-switch (`placeholderData: keepPreviousData`) — no blank states
+  - Every hook exposes `error` and `isError` for caller-controlled error display
