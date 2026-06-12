@@ -56,3 +56,8 @@ packages/
   - In-progress and completed bars stream in real time from the Kraken `ohlc` WebSocket channel
   - Partial (in-progress) candle updates correctly update the last bar rather than appending a duplicate
   - Supports zoom and pan; current price tracked on the price scale
+- **Paper trading** — simulated order entry and portfolio tracking using live Kraken prices, with no real funds involved
+  - Order entry panel per symbol: market and limit orders, buy or sell, with quantity input and quick-fill buttons (25 / 50 / 75 / 100% of available balance or position)
+  - Limit orders stored as pending and auto-executed when the live market price crosses the limit price
+  - Portfolio panel: cash balance, per-symbol holdings with average entry price, current value, and unrealised PnL updated in real time as prices change
+  - Starting paper balance: $10,000 USD; portfolio state persisted across page reloads via `localStorage`
