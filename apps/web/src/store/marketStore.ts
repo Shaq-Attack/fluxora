@@ -7,15 +7,18 @@ interface MarketState {
   tickers: Record<string, Ticker | undefined>;
   trades: Record<string, Trade[] | undefined>;
   connectionStatus: ConnectionStatus;
+  activeSymbol: string;
   setTickers: (tickers: Ticker[]) => void;
   addTrades: (trades: Trade[]) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
+  setActiveSymbol: (symbol: string) => void;
 }
 
 export const useMarketStore = create<MarketState>()((set) => ({
   tickers: {},
   trades: {},
   connectionStatus: 'disconnected',
+  activeSymbol: 'BTC/USD',
   setTickers: (incoming) =>
     set((state) => {
       if (incoming.length === 0) return state;
@@ -42,4 +45,5 @@ export const useMarketStore = create<MarketState>()((set) => ({
       return { trades: updatedTrades };
     }),
   setConnectionStatus: (status) => set({ connectionStatus: status }),
+  setActiveSymbol: (symbol) => set({ activeSymbol: symbol }),
 }));
