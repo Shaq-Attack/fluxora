@@ -7,17 +7,17 @@ import { OrderEntryPanel } from './components/OrderEntryPanel';
 import { PortfolioPanel } from './components/PortfolioPanel';
 import { TickerPanel } from './components/TickerPanel';
 import { TradeTape } from './components/TradeTape';
+import { WatchlistPanel } from './components/WatchlistPanel';
 import { useLimitOrderFill } from './hooks/useLimitOrderFill';
 import { useMarketStore } from './store/marketStore';
 
-const SYMBOLS = ['BTC/USD', 'ETH/USD'] as const;
-
 function App(): JSX.Element {
-  const { setTickers, addTrades, setConnectionStatus } = useMarketStore(
+  const { setTickers, addTrades, setConnectionStatus, activeSymbol } = useMarketStore(
     useShallow((s) => ({
       setTickers: s.setTickers,
       addTrades: s.addTrades,
       setConnectionStatus: s.setConnectionStatus,
+      activeSymbol: s.activeSymbol,
     })),
   );
 
@@ -35,19 +35,18 @@ function App(): JSX.Element {
         <h1 className="text-lg font-semibold tracking-tight">Fluxora</h1>
         <ConnectionBadge />
       </header>
-      <main className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
-        {SYMBOLS.map((symbol) => (
-          <div key={symbol} className="flex flex-col gap-4">
-            <CandlestickChartPanel symbol={symbol} />
-            <TickerPanel symbol={symbol} />
-            <TradeTape symbol={symbol} />
-            <OrderBookPanel symbol={symbol} />
-            <OrderEntryPanel symbol={symbol} />
-          </div>
-        ))}
-      </main>
-      <div className="px-4 pb-4">
-        <PortfolioPanel />
+      <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-4">
+        <aside className="lg:col-span-1">
+          <WatchlistPanel />
+        </aside>
+        <main className="flex flex-col gap-4 lg:col-span-3">
+          <CandlestickChartPanel symbol={activeSymbol} />
+          <TickerPanel symbol={activeSymbol} />
+          <TradeTape symbol={activeSymbol} />
+          <OrderBookPanel key={activeSymbol} symbol={activeSymbol} />
+          <OrderEntryPanel symbol={activeSymbol} />
+          <PortfolioPanel />
+        </main>
       </div>
     </div>
   );
