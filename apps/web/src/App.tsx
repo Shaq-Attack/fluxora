@@ -3,8 +3,11 @@ import { useKrakenFeed } from '@fluxora/data';
 import { CandlestickChartPanel } from './components/CandlestickChartPanel';
 import { ConnectionBadge } from './components/ConnectionBadge';
 import { OrderBookPanel } from './components/OrderBookPanel';
+import { OrderEntryPanel } from './components/OrderEntryPanel';
+import { PortfolioPanel } from './components/PortfolioPanel';
 import { TickerPanel } from './components/TickerPanel';
 import { TradeTape } from './components/TradeTape';
+import { useLimitOrderFill } from './hooks/useLimitOrderFill';
 import { useMarketStore } from './store/marketStore';
 
 const SYMBOLS = ['BTC/USD', 'ETH/USD'] as const;
@@ -24,6 +27,8 @@ function App(): JSX.Element {
     onStatusChange: setConnectionStatus,
   });
 
+  useLimitOrderFill();
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
@@ -37,9 +42,13 @@ function App(): JSX.Element {
             <TickerPanel symbol={symbol} />
             <TradeTape symbol={symbol} />
             <OrderBookPanel symbol={symbol} />
+            <OrderEntryPanel symbol={symbol} />
           </div>
         ))}
       </main>
+      <div className="px-4 pb-4">
+        <PortfolioPanel />
+      </div>
     </div>
   );
 }
