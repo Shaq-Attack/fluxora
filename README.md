@@ -61,6 +61,11 @@ packages/
   - Limit orders stored as pending and auto-executed when the live market price crosses the limit price
   - Portfolio panel: cash balance, per-symbol holdings with average entry price, current value, and unrealised PnL updated in real time as prices change
   - Starting paper balance: $10,000 USD; portfolio state persisted across page reloads via `localStorage`
+- **Watchlist & symbol switching** — persistent watchlist panel and single-symbol trading view
+  - Watchlist panel shows each symbol's last price and 24h change, updating in real time from the Kraken ticker feed
+  - Click any watchlist row to switch the chart, order book, trade tape, and order entry to that symbol instantly
+  - Add and remove symbols via the input at the bottom of the panel; watchlist state persisted to `localStorage` across page reloads
+  - Dashboard layout: watchlist sidebar (left) + active-symbol panels (right)
 - **Data caching layer** — all REST calls go through a shared TanStack Query client
   - `QueryClient` configured with `staleTime: 10 s`, `retry: 2`, and `refetchOnWindowFocus: false`
   - Typed query hooks for all three Kraken REST domains: candles (`useKrakenCandles`), ticker snapshot (`useKrakenTickerSnapshot`), and order-book depth snapshot (`useKrakenDepthSnapshot`)
