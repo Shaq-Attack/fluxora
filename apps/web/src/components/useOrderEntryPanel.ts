@@ -82,9 +82,11 @@ export function useOrderEntryPanel(symbol: string): UseOrderEntryPanelResult {
 
   const handleQuickFill = useCallback(
     (pct: number) => {
-      if (ticker === undefined) return;
+      if (ticker === undefined || !Number.isFinite(ticker.price) || ticker.price <= 0) return;
       const availableQty = side === 'buy' ? cashBalance / ticker.price : positionQty;
-      setQty((availableQty * pct).toFixed(6));
+      // Floor at 6 dp so a 100% fill never rounds above the available balance
+      const flooredQty = Math.floor(availableQty * pct * 1e6) / 1e6;
+      setQty(flooredQty.toFixed(6));
       setError(null);
     },
     [ticker, side, cashBalance, positionQty],
