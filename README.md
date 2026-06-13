@@ -51,10 +51,14 @@ packages/
   - Cumulative depth bars on each row showing relative liquidity at a glance
   - Backed by an off-thread Web Worker that processes snapshots and incremental deltas
   - CRC32 checksum validation (Kraken spec) and sequence-gap detection, with automatic REST re-sync on mismatch
-- **Live candlestick chart** — 1-minute OHLC chart per symbol powered by TradingView Lightweight Charts
-  - 200+ historical bars fetched from Kraken REST on mount (cached 60 s via TanStack Query)
+- **Advanced candlestick chart** — multi-timeframe OHLC chart with technical overlays, powered by TradingView Lightweight Charts
+  - Timeframe selector: switch between 1m, 5m, 15m, and 1h bars; chart reloads with the appropriate Kraken OHLC data
+  - VWAP overlay: cumulative volume-weighted average price rendered as a purple line, toggled on/off per chart
+  - EMA(9) overlay: 9-period exponential moving average rendered as an amber line, toggled on/off per chart
+  - Crosshair price and timestamp labels on hover (TradingView native crosshair mode)
+  - Sliding window cap: last 500 bars kept in memory; older bars are dropped as new ones arrive
+  - Historical bars fetched from Kraken REST on mount and symbol/timeframe switch (cached 60 s via TanStack Query)
   - In-progress and completed bars stream in real time from the Kraken `ohlc` WebSocket channel
-  - Partial (in-progress) candle updates correctly update the last bar rather than appending a duplicate
   - Supports zoom and pan; current price tracked on the price scale
 - **Paper trading** — simulated order entry and portfolio tracking using live Kraken prices, with no real funds involved
   - Order entry panel per symbol: market and limit orders, buy or sell, with quantity input and quick-fill buttons (25 / 50 / 75 / 100% of available balance or position)
