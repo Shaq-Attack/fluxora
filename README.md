@@ -78,6 +78,11 @@ packages/
   - Click any watchlist row to switch the chart, order book, trade tape, and order entry to that symbol instantly
   - Add and remove symbols via the input at the bottom of the panel; watchlist state persisted to `localStorage` across page reloads
   - Dashboard layout: watchlist sidebar (left) + active-symbol panels (right)
+- **Dark / light theme toggle** — runtime theme switching with no page reload and no flash on load
+  - Toggle button in the app header switches all panels between dark and light modes instantly
+  - Selected theme persisted to `localStorage` and restored on next visit; an inline script in `index.html` applies the saved class before React renders, eliminating the flash of wrong theme
+  - All panels use semantic design tokens (`bg-surface`, `text-primary`, `text-muted`, `border`) rather than hardcoded Tailwind grays, so both themes render correctly without per-component `dark:` overrides
+  - Five design-system primitives (`ThemeToggle`, `Badge`, `PanelShell`, `StatDisplay`, `PriceChange`) documented in Storybook with both theme variants; run `pnpm storybook` to browse
 - **Data caching layer** — all REST calls go through a shared TanStack Query client
   - `QueryClient` configured with `staleTime: 10 s`, `retry: 2`, and `refetchOnWindowFocus: false`
   - Typed query hooks for all three Kraken REST domains: candles (`useKrakenCandles`), ticker snapshot (`useKrakenTickerSnapshot`), and order-book depth snapshot (`useKrakenDepthSnapshot`)
