@@ -30,9 +30,9 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
   }
 
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900">
-      <div className="flex items-center justify-between gap-2 border-b border-gray-800 px-3 py-2">
-        <span className="text-sm font-semibold text-gray-300">
+    <div className="rounded-lg border border-border bg-surface-elevated">
+      <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
+        <span className="text-sm font-semibold text-muted">
           {symbol} · {timeframe}
         </span>
 
@@ -46,8 +46,8 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
                 onClick={() => setTimeframe(tf)}
                 className={`rounded px-2 py-0.5 text-xs transition-colors ${
                   tf === timeframe
-                    ? 'bg-gray-800 text-gray-100 ring-1 ring-inset ring-blue-500'
-                    : 'text-gray-500 hover:text-gray-300'
+                    ? 'bg-surface-strong text-primary ring-1 ring-inset ring-blue-500'
+                    : 'text-dim hover:text-muted'
                 }`}
               >
                 {tf}
@@ -62,8 +62,8 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
               onClick={handleToggleVwap}
               className={`rounded px-2 py-0.5 text-xs transition-colors ${
                 indicators.vwap
-                  ? 'bg-gray-800 text-purple-400 ring-1 ring-inset ring-purple-600'
-                  : 'text-gray-500 hover:text-gray-300'
+                  ? 'bg-surface-strong text-purple-400 ring-1 ring-inset ring-purple-600'
+                  : 'text-dim hover:text-muted'
               }`}
             >
               VWAP
@@ -73,8 +73,8 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
               onClick={handleToggleEma}
               className={`rounded px-2 py-0.5 text-xs transition-colors ${
                 indicators.emaPeriod !== null
-                  ? 'bg-gray-800 text-amber-400 ring-1 ring-inset ring-amber-600'
-                  : 'text-gray-500 hover:text-gray-300'
+                  ? 'bg-surface-strong text-amber-400 ring-1 ring-inset ring-amber-600'
+                  : 'text-dim hover:text-muted'
               }`}
             >
               EMA(9)
@@ -89,7 +89,7 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
         </div>
       ) : isLoading && !hasCandles ? (
         <div className="px-3 py-3">
-          <p className="text-xs text-gray-600">Loading chart…</p>
+          <p className="text-xs text-subtle">Loading chart…</p>
         </div>
       ) : (
         <>

@@ -16,7 +16,7 @@ function PositionsTable({ rows }: { rows: PositionRow[] }): JSX.Element {
     <div className="mt-3 overflow-x-auto">
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b border-gray-800 text-left text-gray-500">
+          <tr className="border-b border-border text-left text-dim">
             <th className="pb-1 pr-3 font-medium">Symbol</th>
             <th className="pb-1 pr-3 font-medium">Qty</th>
             <th className="pb-1 pr-3 font-medium">Avg Entry</th>
@@ -27,18 +27,18 @@ function PositionsTable({ rows }: { rows: PositionRow[] }): JSX.Element {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.symbol} className="border-b border-gray-800/50">
-              <td className="py-1 pr-3 font-medium text-gray-200">{row.symbol}</td>
-              <td className="py-1 pr-3 font-mono tabular-nums text-gray-300">
+            <tr key={row.symbol} className="border-b border-border/50">
+              <td className="py-1 pr-3 font-medium text-primary">{row.symbol}</td>
+              <td className="py-1 pr-3 font-mono tabular-nums text-muted">
                 {formatQuantity(row.qty)}
               </td>
-              <td className="py-1 pr-3 font-mono tabular-nums text-gray-300">
+              <td className="py-1 pr-3 font-mono tabular-nums text-muted">
                 ${formatPrice(row.avgEntryPrice)}
               </td>
-              <td className="py-1 pr-3 font-mono tabular-nums text-gray-300">
+              <td className="py-1 pr-3 font-mono tabular-nums text-muted">
                 ${formatPrice(row.currentPrice)}
               </td>
-              <td className="py-1 pr-3 font-mono tabular-nums text-gray-300">
+              <td className="py-1 pr-3 font-mono tabular-nums text-muted">
                 ${formatPrice(row.currentValue)}
               </td>
               <td className={`py-1 font-mono tabular-nums ${pnlClass(row.unrealisedPnl)}`}>
@@ -59,11 +59,11 @@ export function PortfolioPanel(): JSX.Element {
   const isEmpty = positionRows.length === 0 && pendingOrders.length === 0;
 
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900 p-4">
+    <div className="rounded-lg border border-border bg-surface-elevated p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-gray-300">Paper Trading Portfolio</h2>
+        <h2 className="text-sm font-semibold text-muted">Paper Trading Portfolio</h2>
         <button
-          className="text-xs text-gray-500 hover:text-red-400"
+          className="text-xs text-dim hover:text-red-400"
           onClick={handleReset}
           type="button"
         >
@@ -73,15 +73,15 @@ export function PortfolioPanel(): JSX.Element {
 
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <p className="text-xs text-gray-500">Cash</p>
-          <p className="font-mono text-sm tabular-nums text-white">${formatPrice(cashBalance)}</p>
+          <p className="text-xs text-dim">Cash</p>
+          <p className="font-mono text-sm tabular-nums text-primary">${formatPrice(cashBalance)}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Total Value</p>
-          <p className="font-mono text-sm tabular-nums text-white">${formatPrice(totalValue)}</p>
+          <p className="text-xs text-dim">Total Value</p>
+          <p className="font-mono text-sm tabular-nums text-primary">${formatPrice(totalValue)}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Unrealised PnL</p>
+          <p className="text-xs text-dim">Unrealised PnL</p>
           <p className={`font-mono text-sm tabular-nums ${pnlClass(totalUnrealisedPnl)}`}>
             {formatPnl(totalUnrealisedPnl)}
           </p>
@@ -89,21 +89,21 @@ export function PortfolioPanel(): JSX.Element {
       </div>
 
       {isEmpty ? (
-        <p className="mt-3 text-xs text-gray-600">No open positions.</p>
+        <p className="mt-3 text-xs text-subtle">No open positions.</p>
       ) : (
         <>
           {positionRows.length > 0 && <PositionsTable rows={positionRows} />}
 
           {pendingOrders.length > 0 && (
             <div className="mt-3">
-              <p className="mb-1 text-xs font-medium text-gray-500">Pending Limit Orders</p>
+              <p className="mb-1 text-xs font-medium text-dim">Pending Limit Orders</p>
               <div className="flex flex-col gap-1">
                 {pendingOrders.map((order) => (
                   <div
-                    className="flex items-center justify-between rounded bg-gray-800 px-2 py-1"
+                    className="flex items-center justify-between rounded bg-surface-strong px-2 py-1"
                     key={order.id}
                   >
-                    <span className="font-mono text-xs tabular-nums text-gray-300">
+                    <span className="font-mono text-xs tabular-nums text-muted">
                       <span
                         className={order.side === 'buy' ? 'text-green-400' : 'text-red-400'}
                       >
@@ -114,7 +114,7 @@ export function PortfolioPanel(): JSX.Element {
                       ${formatPrice(order.limitPrice)}
                     </span>
                     <button
-                      className="ml-2 text-xs text-gray-500 hover:text-red-400"
+                      className="ml-2 text-xs text-dim hover:text-red-400"
                       onClick={() => handleCancelOrder(order.id)}
                       type="button"
                     >
