@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useKrakenFeed } from '@fluxora/data';
 import { CandlestickChartPanel } from './components/CandlestickChartPanel';
 import { ConnectionBadge } from './components/ConnectionBadge';
+import { ThemeToggle } from './components/ThemeToggle';
 import { OrderBookPanel } from './components/OrderBookPanel';
 import { OrderEntryPanel } from './components/OrderEntryPanel';
 import { PortfolioPanel } from './components/PortfolioPanel';
@@ -52,10 +53,13 @@ function App(): JSX.Element {
   });
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-950 text-white">
-      <header className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
+    <div className="flex h-screen flex-col overflow-hidden bg-surface text-primary">
+      <header className="flex items-center justify-between border-b border-border px-4 py-3">
         <h1 className="text-lg font-semibold tracking-tight">Fluxora</h1>
-        <ConnectionBadge />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <ConnectionBadge />
+        </div>
       </header>
       <Group
         orientation="horizontal"
@@ -66,7 +70,7 @@ function App(): JSX.Element {
         <Panel id="sidebar" minSize={15} className="overflow-auto">
           <WatchlistPanel />
         </Panel>
-        <Separator className="w-1 cursor-col-resize bg-gray-800 transition-colors hover:bg-blue-500" />
+        <Separator className="w-1 cursor-col-resize bg-border transition-colors hover:bg-blue-500" />
         <Panel id="main" minSize={40} className="overflow-auto">
           <Group
             orientation="vertical"
@@ -76,16 +80,16 @@ function App(): JSX.Element {
             <Panel id="chart" minSize={15} className="overflow-auto">
               <CandlestickChartPanel symbol={activeSymbol} />
             </Panel>
-            <Separator className="h-1 cursor-row-resize bg-gray-800 transition-colors hover:bg-blue-500" />
+            <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
             <Panel id="market-data" minSize={10} className="overflow-auto">
               <TickerPanel symbol={activeSymbol} />
               <TradeTape symbol={activeSymbol} />
             </Panel>
-            <Separator className="h-1 cursor-row-resize bg-gray-800 transition-colors hover:bg-blue-500" />
+            <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
             <Panel id="order-book" minSize={10} className="overflow-auto">
               <OrderBookPanel key={activeSymbol} symbol={activeSymbol} />
             </Panel>
-            <Separator className="h-1 cursor-row-resize bg-gray-800 transition-colors hover:bg-blue-500" />
+            <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
             <Panel id="trading" minSize={10} className="overflow-auto">
               <OrderEntryPanel symbol={activeSymbol} />
               <PortfolioPanel />
