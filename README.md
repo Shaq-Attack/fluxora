@@ -47,8 +47,10 @@ packages/
   - Trade tape: live matched orders with timestamp, price, size, and side colouring (green buy / red sell), virtualised via `@tanstack/react-virtual` for high throughput
   - Connection badge: visible Live / Connecting / Disconnected indicator with exponential-backoff auto-reconnect
 - **Live order book panel** — streams Kraken `book` channel for BTC/USD and ETH/USD
-  - Bid and ask grids showing top 10 levels with colour-coded prices (green bids / red asks)
-  - Cumulative depth bars on each row showing relative liquidity at a glance
+  - Bid and ask grids with colour-coded prices (green bids / red asks) and cumulative depth bars on each row
+  - **Depth selector** — choose 10, 25, or 50 visible levels; changing depth resubscribes the worker and reconnects the WebSocket with the new depth immediately
+  - **Tick aggregation** — group price levels into $0.10, $1, or $10 buckets; quantities within each bucket are summed and the bucket floor price is shown; CRC32 checksum validation is automatically suspended while aggregation is active
+  - Depth and tick-size preferences persisted to `localStorage` and restored on page reload
   - Backed by an off-thread Web Worker that processes snapshots and incremental deltas
   - CRC32 checksum validation (Kraken spec) and sequence-gap detection, with automatic REST re-sync on mismatch
 - **Advanced candlestick chart** — multi-timeframe OHLC chart with technical overlays, powered by TradingView Lightweight Charts

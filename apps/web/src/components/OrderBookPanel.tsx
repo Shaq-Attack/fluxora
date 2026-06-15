@@ -1,4 +1,6 @@
 import { useOrderBookPanel } from './useOrderBookPanel';
+import { useOrderBookStore } from '../store/orderBookStore';
+import type { OrderBookDepth, TickSize } from '../store/orderBookStore';
 import { formatPrice, formatQuantity } from '../lib/format';
 
 interface OrderBookPanelProps {
@@ -7,6 +9,9 @@ interface OrderBookPanelProps {
 
 export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
   const orderBook = useOrderBookPanel(symbol);
+
+  const depth = useOrderBookStore((s) => s.depth);
+  const tickSize = useOrderBookStore((s) => s.tickSize);
 
   if (orderBook === undefined) {
     return (
@@ -20,8 +25,29 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
 
   return (
     <div className="rounded-lg border border-gray-800 bg-gray-900">
-      <div className="border-b border-gray-800 px-3 py-2">
+      <div className="flex items-center gap-3 border-b border-gray-800 px-3 py-2">
         <span className="text-sm font-semibold text-gray-300">{symbol} Order Book</span>
+        <div className="ml-auto flex items-center gap-2">
+          <select
+            value={depth}
+            onChange={(e) => useOrderBookStore.getState().setDepth(Number(e.target.value) as OrderBookDepth)}
+            className="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-300"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
+          <select
+            value={tickSize}
+            onChange={(e) => useOrderBookStore.getState().setTickSize(Number(e.target.value) as TickSize)}
+            className="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-300"
+          >
+            <option value={0}>None</option>
+            <option value={0.1}>$0.10</option>
+            <option value={1}>$1</option>
+            <option value={10}>$10</option>
+          </select>
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-px bg-gray-800">
         <div className="bg-gray-900">

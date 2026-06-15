@@ -9,6 +9,7 @@ import { fetchKrakenDepthSnapshot } from '../kraken/restDepth';
 export interface UseKrakenOrderBookOptions {
   symbol: string;
   depth: number;
+  skipChecksum?: boolean;
   createWorker: () => Worker;
   onOrderBook: (ob: OrderBook) => void;
   onStatusChange: (status: ConnectionStatus) => void;
@@ -18,12 +19,13 @@ export function useKrakenOrderBook(options: UseKrakenOrderBookOptions): void {
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
+  const { symbol, depth, skipChecksum = false } = options;
+
   useEffect(() => {
     let cancelled = false;
-    const { symbol, depth, createWorker } = optionsRef.current;
-    const worker = createWorker();
+    const worker = optionsRef.current.createWorker();
 
-    const checksumPrecision = KRAKEN_CHECKSUM_PRECISION[symbol];
+    const checksumPrecision = skipChecksum ? undefined : KRAKEN_CHECKSUM_PRECISION[symbol];
     const subscribeMsg: WorkerInboundMessage = {
       type: 'SUBSCRIBE',
       symbol,
@@ -115,7 +117,5 @@ export function useKrakenOrderBook(options: UseKrakenOrderBookOptions): void {
       worker.onmessage = null;
       worker.terminate();
     };
-    // worker, connection created once per mount; callbacks proxied via ref
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [symbol, depth, skipChecksum]);
 }
