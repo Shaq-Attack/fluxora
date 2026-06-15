@@ -67,6 +67,12 @@ packages/
   - Limit orders stored as pending and auto-executed when the live market price crosses the limit price
   - Portfolio panel: cash balance, per-symbol holdings with average entry price, current value, and unrealised PnL updated in real time as prices change
   - Starting paper balance: $10,000 USD; portfolio state persisted across page reloads via `localStorage`
+- **Resizable multi-panel layout** — drag-to-resize panel dividers let users adjust every panel to their preferred proportions
+  - Horizontal divider between the watchlist sidebar and the main content area
+  - Three vertical dividers within the main area: chart / market-data / order-book / trading sections
+  - Panel size ratios persisted to `localStorage` via Zustand and restored on page reload
+  - Keyboard shortcuts: press **B** to pre-select Buy or **S** to pre-select Sell in the order entry panel (shortcuts are suppressed when a text input is focused)
+  - Panels maintain their proportional sizes on window resize — no overflow or hidden content
 - **Watchlist & symbol switching** — persistent watchlist panel and single-symbol trading view
   - Watchlist panel shows each symbol's last price and 24h change, updating in real time from the Kraken ticker feed
   - Click any watchlist row to switch the chart, order book, trade tape, and order entry to that symbol instantly

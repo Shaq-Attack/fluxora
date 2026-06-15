@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 import type { OrderSide, OrderType, Ticker } from '@fluxora/types';
 import { useMarketStore } from '../store/marketStore';
 import { usePaperTradingStore } from '../store/paperTradingStore';
+import { useLayoutStore } from '../store/layoutStore';
 
 interface FormState {
   side: OrderSide;
@@ -53,6 +54,12 @@ export function useOrderEntryPanel(symbol: string): UseOrderEntryPanelResult {
   );
   const ticker = useMarketStore((s) => s.tickers[symbol]);
   const positionQty = positions[symbol]?.qty ?? 0;
+
+  const orderEntrySide = useLayoutStore((s) => s.orderEntrySide);
+
+  useEffect(() => {
+    setSide(orderEntrySide);
+  }, [orderEntrySide]);
 
   useEffect(() => {
     return () => {
