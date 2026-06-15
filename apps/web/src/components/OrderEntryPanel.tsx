@@ -27,12 +27,12 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
   const { ticker, cashBalance, positionQty, isSubmitDisabled } = data;
 
   const sideButtonClass = (btn: OrderSide): string => {
-    if (btn === 'buy') return side === 'buy' ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400';
-    return side === 'sell' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400';
+    if (btn === 'buy') return side === 'buy' ? 'bg-green-600 text-white' : 'bg-surface-strong text-dim';
+    return side === 'sell' ? 'bg-red-600 text-white' : 'bg-surface-strong text-dim';
   };
 
   const typeButtonClass = (btn: OrderType): string =>
-    orderType === btn ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-400';
+    orderType === btn ? 'bg-blue-700 text-white' : 'bg-surface-strong text-dim';
 
   const submitClass =
     side === 'buy'
@@ -40,8 +40,8 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
       : 'w-full rounded bg-red-600 py-1.5 text-sm font-semibold text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-40';
 
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900 p-4">
-      <h2 className="mb-3 text-sm font-semibold text-gray-300">{symbol} Order Entry</h2>
+    <div className="rounded-lg border border-border bg-surface-elevated p-4">
+      <h2 className="mb-3 text-sm font-semibold text-muted">{symbol} Order Entry</h2>
 
       <div className="mb-3 flex gap-1">
         <button
@@ -78,9 +78,9 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
       </div>
 
       <div className="mb-2">
-        <label className="mb-0.5 block text-xs text-gray-500">Quantity</label>
+        <label className="mb-0.5 block text-xs text-dim">Quantity</label>
         <input
-          className="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1 font-mono text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-gray-600"
+          className="w-full rounded border border-border-strong bg-surface-strong px-2 py-1 font-mono text-sm text-primary placeholder-subtle focus:outline-none focus:ring-1 focus:ring-border-strong"
           onChange={(e) => handleQtyChange(e.target.value)}
           placeholder="0.000000"
           type="number"
@@ -90,7 +90,7 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
           <div className="mt-1 flex gap-1">
             {QUICK_FILL_PCTS.map(({ label, value }) => (
               <button
-                className="flex-1 rounded bg-gray-800 px-1 py-0.5 text-xs text-gray-400 hover:bg-gray-700"
+                className="flex-1 rounded bg-surface-strong px-1 py-0.5 text-xs text-dim hover:bg-border"
                 key={label}
                 onClick={() => handleQuickFill(value)}
                 type="button"
@@ -104,9 +104,9 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
 
       {orderType === 'limit' && (
         <div className="mb-2">
-          <label className="mb-0.5 block text-xs text-gray-500">Limit Price (USD)</label>
+          <label className="mb-0.5 block text-xs text-dim">Limit Price (USD)</label>
           <input
-            className="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1 font-mono text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-gray-600"
+            className="w-full rounded border border-border-strong bg-surface-strong px-2 py-1 font-mono text-sm text-primary placeholder-subtle focus:outline-none focus:ring-1 focus:ring-border-strong"
             onChange={(e) => handleLimitPriceChange(e.target.value)}
             placeholder="0.00"
             type="number"
@@ -116,8 +116,8 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
       )}
 
       {ticker !== undefined && (
-        <p className="mb-2 text-xs text-gray-500">
-          Last: <span className="font-mono text-gray-300">${formatPrice(ticker.price)}</span>
+        <p className="mb-2 text-xs text-dim">
+          Last: <span className="font-mono text-muted">${formatPrice(ticker.price)}</span>
           {' · '}
           {side === 'buy'
             ? `Cash: $${formatPrice(cashBalance)}`

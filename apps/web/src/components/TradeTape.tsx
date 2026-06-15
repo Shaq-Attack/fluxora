@@ -17,7 +17,7 @@ function TradeRow({ trade }: { trade: Trade }): JSX.Element {
     <div
       className={`flex items-center gap-3 px-3 font-mono text-xs tabular-nums ${colourClass}`}
     >
-      <span className="w-16 shrink-0 text-gray-500">{formatTime(trade.timestamp)}</span>
+      <span className="w-16 shrink-0 text-dim">{formatTime(trade.timestamp)}</span>
       <span className="w-24 shrink-0 text-right">{formatPrice(trade.price)}</span>
       <span className="w-20 shrink-0 text-right">{formatQuantity(trade.quantity)}</span>
       <span className="w-4 shrink-0">{trade.side === 'buy' ? 'B' : 'S'}</span>
@@ -37,13 +37,13 @@ export function TradeTape({ symbol }: TradeTapeProps): JSX.Element {
   });
 
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900">
-      <div className="flex items-center border-b border-gray-800 px-3 py-2">
-        <h2 className="text-sm font-semibold text-gray-300">{symbol} Trades</h2>
+    <div className="rounded-lg border border-border bg-surface-elevated">
+      <div className="flex items-center border-b border-border px-3 py-2">
+        <h2 className="text-sm font-semibold text-muted">{symbol} Trades</h2>
       </div>
       <div ref={parentRef} className="h-64 overflow-auto">
         {trades.length === 0 ? (
-          <p className="p-3 text-xs text-gray-600">Waiting for data…</p>
+          <p className="p-3 text-xs text-subtle">Waiting for data…</p>
         ) : (
           // Inline styles here are required by @tanstack/react-virtual for absolute positioning
           <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>

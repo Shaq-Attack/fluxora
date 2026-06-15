@@ -16,11 +16,16 @@ const config: Config = {
         surface: {
           DEFAULT: 'hsl(var(--surface))',
           elevated: 'hsl(var(--surface-elevated))',
+          strong: 'hsl(var(--surface-strong))',
         },
         border: {
           DEFAULT: 'hsl(var(--border))',
           strong: 'hsl(var(--border-strong))',
         },
+        primary: 'hsl(var(--text-primary))',
+        muted: 'hsl(var(--text-muted))',
+        dim: 'hsl(var(--text-dim))',
+        subtle: 'hsl(var(--text-subtle))',
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],

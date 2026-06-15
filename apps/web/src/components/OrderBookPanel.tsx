@@ -15,8 +15,8 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
 
   if (orderBook === undefined) {
     return (
-      <div className="rounded-lg border border-gray-800 bg-gray-900 p-3">
-        <p className="text-xs text-gray-600">Waiting for Order Book data…</p>
+      <div className="rounded-lg border border-border bg-surface-elevated p-3">
+        <p className="text-xs text-subtle">Waiting for Order Book data…</p>
       </div>
     );
   }
@@ -24,14 +24,14 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
   const { bids: bidsWithDepth, asks: asksWithDepth } = orderBook;
 
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900">
-      <div className="flex items-center gap-3 border-b border-gray-800 px-3 py-2">
-        <span className="text-sm font-semibold text-gray-300">{symbol} Order Book</span>
+    <div className="rounded-lg border border-border bg-surface-elevated">
+      <div className="flex items-center gap-3 border-b border-border px-3 py-2">
+        <span className="text-sm font-semibold text-muted">{symbol} Order Book</span>
         <div className="ml-auto flex items-center gap-2">
           <select
             value={depth}
             onChange={(e) => useOrderBookStore.getState().setDepth(Number(e.target.value) as OrderBookDepth)}
-            className="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-300"
+            className="rounded bg-surface-strong px-2 py-0.5 text-xs text-muted"
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -40,7 +40,7 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
           <select
             value={tickSize}
             onChange={(e) => useOrderBookStore.getState().setTickSize(Number(e.target.value) as TickSize)}
-            className="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-300"
+            className="rounded bg-surface-strong px-2 py-0.5 text-xs text-muted"
           >
             <option value={0}>None</option>
             <option value={0.1}>$0.10</option>
@@ -49,11 +49,11 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
           </select>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-px bg-gray-800">
-        <div className="bg-gray-900">
+      <div className="grid grid-cols-2 gap-px bg-border">
+        <div className="bg-surface-elevated">
           <div className="grid grid-cols-2 gap-1 px-3 py-1">
-            <span className="text-xs text-gray-500">Price</span>
-            <span className="text-right text-xs text-gray-500">Size</span>
+            <span className="text-xs text-dim">Price</span>
+            <span className="text-right text-xs text-dim">Size</span>
           </div>
           {bidsWithDepth.map((level) => (
             <div key={level.price} className="relative px-3 py-0.5">
@@ -66,17 +66,17 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
                 <span className="font-mono text-xs tabular-nums text-green-400">
                   {formatPrice(level.price)}
                 </span>
-                <span className="text-right font-mono text-xs tabular-nums text-gray-400">
+                <span className="text-right font-mono text-xs tabular-nums text-dim">
                   {formatQuantity(level.quantity)}
                 </span>
               </div>
             </div>
           ))}
         </div>
-        <div className="bg-gray-900">
+        <div className="bg-surface-elevated">
           <div className="grid grid-cols-2 gap-1 px-3 py-1">
-            <span className="text-xs text-gray-500">Price</span>
-            <span className="text-right text-xs text-gray-500">Size</span>
+            <span className="text-xs text-dim">Price</span>
+            <span className="text-right text-xs text-dim">Size</span>
           </div>
           {asksWithDepth.map((level) => (
             <div key={level.price} className="relative px-3 py-0.5">
@@ -89,7 +89,7 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
                 <span className="font-mono text-xs tabular-nums text-red-400">
                   {formatPrice(level.price)}
                 </span>
-                <span className="text-right font-mono text-xs tabular-nums text-gray-400">
+                <span className="text-right font-mono text-xs tabular-nums text-dim">
                   {formatQuantity(level.quantity)}
                 </span>
               </div>

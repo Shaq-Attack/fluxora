@@ -30,9 +30,4 @@
   * {
     box-sizing: border-box;
   }
-
-  body {
-    @apply bg-surface text-primary antialiased;
-    font-feature-settings: 'tnum' 1;
-  }
 }

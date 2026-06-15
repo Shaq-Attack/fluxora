@@ -7,6 +7,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem('fluxora-theme');
+          var stored = raw ? JSON.parse(raw) : null;
+          if (stored && stored.state && stored.state.isDark === false) {
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (_) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
