@@ -13,9 +13,12 @@ interface LayoutState {
   outerLayout: Record<string, number>;
   mainLayout: Record<string, number>;
   orderEntrySide: 'buy' | 'sell';
+  // Ephemeral: id of the panel currently expanded to fullscreen, or null. Not persisted.
+  fullscreenPanelId: string | null;
   setOuterLayout: (layout: Record<string, number>) => void;
   setMainLayout: (layout: Record<string, number>) => void;
   setOrderEntrySide: (side: 'buy' | 'sell') => void;
+  setFullscreenPanel: (id: string | null) => void;
 }
 
 export const useLayoutStore = create<LayoutState>()(
@@ -24,9 +27,11 @@ export const useLayoutStore = create<LayoutState>()(
       outerLayout: DEFAULT_OUTER_LAYOUT,
       mainLayout: DEFAULT_MAIN_LAYOUT,
       orderEntrySide: 'buy',
+      fullscreenPanelId: null,
       setOuterLayout: (outerLayout) => set({ outerLayout }),
       setMainLayout: (mainLayout) => set({ mainLayout }),
       setOrderEntrySide: (orderEntrySide) => set({ orderEntrySide }),
+      setFullscreenPanel: (fullscreenPanelId) => set({ fullscreenPanelId }),
     }),
     {
       name: 'fluxora-layout',
