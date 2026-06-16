@@ -71,12 +71,9 @@ packages/
   - Limit orders stored as pending and auto-executed when the live market price crosses the limit price
   - Portfolio panel: cash balance, per-symbol holdings with average entry price, current value, and unrealised PnL updated in real time as prices change
   - Starting paper balance: $10,000 USD; portfolio state persisted across page reloads via `localStorage`
-- **Responsive multi-panel layout** — adapts to screen width with a per-panel fullscreen toggle
-  - Wide desktop (≥1024px): drag-to-resize panel dividers let users adjust every panel to their preferred proportions
-    - Horizontal divider between the watchlist sidebar and the main content area
-    - Three vertical dividers within the main area: chart / market-data / order-book / trading sections
-    - Panel size ratios persisted to `localStorage` via Zustand and restored on page reload
-  - Narrow screens (<1024px): the whole page scrolls as a single column and panels size to their content, so reaching the bottom panel no longer means scrolling inside it
+- **Scrolling multi-panel layout** — the whole page scrolls so every panel fits regardless of screen height
+  - Panels size to their content; reaching the bottom panel means scrolling the page, not scrolling inside a panel
+  - Responsive two-column grid on wide screens (≥1024px) to use the horizontal space, collapsing to a single column on narrow screens
   - Fullscreen toggle on every panel — expand any panel to fill the viewport and press **Esc** (or the toggle) to exit; only one panel is fullscreen at a time and the choice is not persisted
   - Keyboard shortcuts: press **B** to pre-select Buy or **S** to pre-select Sell in the order entry panel (shortcuts are suppressed when a text input is focused)
 - **Watchlist & symbol switching** — persistent watchlist panel and single-symbol trading view
