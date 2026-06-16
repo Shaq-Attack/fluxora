@@ -8,11 +8,13 @@ import { ConnectionBadge } from './components/ConnectionBadge';
 import { ThemeToggle } from './components/ThemeToggle';
 import { OrderBookPanel } from './components/OrderBookPanel';
 import { OrderEntryPanel } from './components/OrderEntryPanel';
+import { PanelErrorBoundary } from './components/PanelErrorBoundary';
 import { PortfolioPanel } from './components/PortfolioPanel';
 import { TickerPanel } from './components/TickerPanel';
 import { TradeTape } from './components/TradeTape';
 import { WatchlistPanel } from './components/WatchlistPanel';
 import { useLimitOrderFill } from './hooks/useLimitOrderFill';
+import { reportWsLatency } from './lib/metrics';
 import { useLayoutStore } from './store/layoutStore';
 import { useMarketStore } from './store/marketStore';
 
@@ -39,6 +41,7 @@ function App(): JSX.Element {
     onTicker: setTickers,
     onTrade: addTrades,
     onStatusChange: setConnectionStatus,
+    onLatency: reportWsLatency,
   });
 
   useLimitOrderFill();
@@ -78,21 +81,31 @@ function App(): JSX.Element {
             onLayoutChanged={(layout: Layout) => setMainLayout(layout)}
           >
             <Panel id="chart" minSize={15} className="overflow-auto">
-              <CandlestickChartPanel symbol={activeSymbol} />
+              <PanelErrorBoundary name="chart">
+                <CandlestickChartPanel symbol={activeSymbol} />
+              </PanelErrorBoundary>
             </Panel>
             <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
             <Panel id="market-data" minSize={10} className="overflow-auto">
               <TickerPanel symbol={activeSymbol} />
-              <TradeTape symbol={activeSymbol} />
+              <PanelErrorBoundary name="trade tape">
+                <TradeTape symbol={activeSymbol} />
+              </PanelErrorBoundary>
             </Panel>
             <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
             <Panel id="order-book" minSize={10} className="overflow-auto">
-              <OrderBookPanel key={activeSymbol} symbol={activeSymbol} />
+              <PanelErrorBoundary name="order book">
+                <OrderBookPanel key={activeSymbol} symbol={activeSymbol} />
+              </PanelErrorBoundary>
             </Panel>
             <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
             <Panel id="trading" minSize={10} className="overflow-auto">
-              <OrderEntryPanel symbol={activeSymbol} />
-              <PortfolioPanel />
+              <PanelErrorBoundary name="order entry">
+                <OrderEntryPanel symbol={activeSymbol} />
+              </PanelErrorBoundary>
+              <PanelErrorBoundary name="portfolio">
+                <PortfolioPanel />
+              </PanelErrorBoundary>
             </Panel>
           </Group>
         </Panel>
