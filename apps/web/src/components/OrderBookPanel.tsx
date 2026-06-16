@@ -25,7 +25,7 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
 
   return (
     <div className="rounded-lg border border-border bg-surface-elevated">
-      <div className="flex items-center gap-3 border-b border-border px-3 py-2">
+      <div className="flex items-center gap-3 border-b border-border px-3 py-2 pr-9">
         <span className="text-sm font-semibold text-muted">{symbol} Order Book</span>
         <div className="ml-auto flex items-center gap-2">
           <select

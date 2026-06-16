@@ -1,22 +1,20 @@
-import { Group, Panel, Separator } from 'react-resizable-panels';
 import type { Layout } from 'react-resizable-panels';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useShallow } from 'zustand/react/shallow';
 import { useKrakenFeed } from '@fluxora/data';
-import { CandlestickChartPanel } from './components/CandlestickChartPanel';
 import { ConnectionBadge } from './components/ConnectionBadge';
+import { ResizableDashboard } from './components/ResizableDashboard';
+import { StackedDashboard } from './components/StackedDashboard';
 import { ThemeToggle } from './components/ThemeToggle';
-import { OrderBookPanel } from './components/OrderBookPanel';
-import { OrderEntryPanel } from './components/OrderEntryPanel';
-import { PanelErrorBoundary } from './components/PanelErrorBoundary';
-import { PortfolioPanel } from './components/PortfolioPanel';
-import { TickerPanel } from './components/TickerPanel';
-import { TradeTape } from './components/TradeTape';
-import { WatchlistPanel } from './components/WatchlistPanel';
 import { useLimitOrderFill } from './hooks/useLimitOrderFill';
+import { useMediaQuery } from './hooks/useMediaQuery';
 import { reportWsLatency } from './lib/metrics';
 import { useLayoutStore } from './store/layoutStore';
 import { useMarketStore } from './store/marketStore';
+
+// Wide screens keep the drag-to-resize split panes; below this the page scrolls
+// as one column with content-sized panels.
+const WIDE_SCREEN_QUERY = '(min-width: 1024px)';
 
 function App(): JSX.Element {
   const { setTickers, addTrades, setConnectionStatus, activeSymbol } = useMarketStore(
@@ -37,6 +35,8 @@ function App(): JSX.Element {
     })),
   );
 
+  const isWideScreen = useMediaQuery(WIDE_SCREEN_QUERY);
+
   useKrakenFeed({
     onTicker: setTickers,
     onTrade: addTrades,
@@ -56,60 +56,31 @@ function App(): JSX.Element {
   });
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-surface text-primary">
-      <header className="flex items-center justify-between border-b border-border px-4 py-3">
+    <div
+      className={
+        isWideScreen
+          ? 'flex h-screen flex-col overflow-hidden bg-surface text-primary'
+          : 'flex min-h-screen flex-col bg-surface text-primary'
+      }
+    >
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-surface px-4 py-3">
         <h1 className="text-lg font-semibold tracking-tight">Fluxora</h1>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <ConnectionBadge />
         </div>
       </header>
-      <Group
-        orientation="horizontal"
-        defaultLayout={outerLayout}
-        onLayoutChanged={(layout: Layout) => setOuterLayout(layout)}
-        className="flex-1"
-      >
-        <Panel id="sidebar" minSize={15} className="overflow-auto">
-          <WatchlistPanel />
-        </Panel>
-        <Separator className="w-1 cursor-col-resize bg-border transition-colors hover:bg-blue-500" />
-        <Panel id="main" minSize={40} className="overflow-auto">
-          <Group
-            orientation="vertical"
-            defaultLayout={mainLayout}
-            onLayoutChanged={(layout: Layout) => setMainLayout(layout)}
-          >
-            <Panel id="chart" minSize={15} className="overflow-auto">
-              <PanelErrorBoundary name="chart">
-                <CandlestickChartPanel symbol={activeSymbol} />
-              </PanelErrorBoundary>
-            </Panel>
-            <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
-            <Panel id="market-data" minSize={10} className="overflow-auto">
-              <TickerPanel symbol={activeSymbol} />
-              <PanelErrorBoundary name="trade tape">
-                <TradeTape symbol={activeSymbol} />
-              </PanelErrorBoundary>
-            </Panel>
-            <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
-            <Panel id="order-book" minSize={10} className="overflow-auto">
-              <PanelErrorBoundary name="order book">
-                <OrderBookPanel key={activeSymbol} symbol={activeSymbol} />
-              </PanelErrorBoundary>
-            </Panel>
-            <Separator className="h-1 cursor-row-resize bg-border transition-colors hover:bg-blue-500" />
-            <Panel id="trading" minSize={10} className="overflow-auto">
-              <PanelErrorBoundary name="order entry">
-                <OrderEntryPanel symbol={activeSymbol} />
-              </PanelErrorBoundary>
-              <PanelErrorBoundary name="portfolio">
-                <PortfolioPanel />
-              </PanelErrorBoundary>
-            </Panel>
-          </Group>
-        </Panel>
-      </Group>
+      {isWideScreen ? (
+        <ResizableDashboard
+          activeSymbol={activeSymbol}
+          outerLayout={outerLayout}
+          mainLayout={mainLayout}
+          onOuterLayoutChange={(layout: Layout) => setOuterLayout(layout)}
+          onMainLayoutChange={(layout: Layout) => setMainLayout(layout)}
+        />
+      ) : (
+        <StackedDashboard activeSymbol={activeSymbol} />
+      )}
     </div>
   );
 }
