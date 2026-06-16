@@ -11,6 +11,10 @@ pnpm dev
 
 Requires Node 20+ and pnpm 9+.
 
+To enable error tracking and performance monitoring, copy `.env.example` to `.env` and set
+`VITE_SENTRY_DSN` to your Sentry project DSN. When the DSN is unset, Sentry is disabled and the
+app runs normally.
+
 ## Workspace Structure
 
 ```
@@ -83,6 +87,12 @@ packages/
   - Selected theme persisted to `localStorage` and restored on next visit; an inline script in `index.html` applies the saved class before React renders, eliminating the flash of wrong theme
   - All panels use semantic design tokens (`bg-surface`, `text-primary`, `text-muted`, `border`) rather than hardcoded Tailwind grays, so both themes render correctly without per-component `dark:` overrides
   - Five design-system primitives (`ThemeToggle`, `Badge`, `PanelShell`, `StatDisplay`, `PriceChange`) documented in Storybook with both theme variants; run `pnpm storybook` to browse
+- **Observability** — Sentry error tracking and performance monitoring plus custom runtime metrics
+  - Sentry SDK initialised at startup (reads `VITE_SENTRY_DSN`); unhandled errors and promise rejections are captured automatically
+  - Each main panel (chart, order book, trade tape, order entry, portfolio) is wrapped in a React error boundary that reports the crash to Sentry and shows a retry fallback instead of taking down the dashboard
+  - WebSocket round-trip latency measured via Kraken ping/pong and reported to Sentry as a custom measurement
+  - Core Web Vitals (CLS, LCP, INP) collected with the `web-vitals` package and reported to Sentry Performance
+  - Lightweight FPS monitor warns in the console when the frame rate drops below 30 FPS
 - **Data caching layer** — all REST calls go through a shared TanStack Query client
   - `QueryClient` configured with `staleTime: 10 s`, `retry: 2`, and `refetchOnWindowFocus: false`
   - Typed query hooks for all three Kraken REST domains: candles (`useKrakenCandles`), ticker snapshot (`useKrakenTickerSnapshot`), and order-book depth snapshot (`useKrakenDepthSnapshot`)
