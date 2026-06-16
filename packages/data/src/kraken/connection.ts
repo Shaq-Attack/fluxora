@@ -16,18 +16,25 @@ const SUBSCRIBE_TRADE = JSON.stringify({
 const INITIAL_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 30_000;
 const JITTER_FACTOR = 0.2;
+const PING_INTERVAL_MS = 10_000;
 
 export interface KrakenConnectionOptions {
   onMessage: (raw: string) => void;
   onStatusChange: (status: ConnectionStatus) => void;
+  /** Optional: receives the WebSocket ping→pong round-trip time in milliseconds. */
+  onLatency?: (ms: number) => void;
 }
 
 export class KrakenConnection {
   private ws: WebSocket | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private pingTimer: ReturnType<typeof setInterval> | null = null;
   private backoffMs = INITIAL_BACKOFF_MS;
   private stopped = false;
   private lastStatus: ConnectionStatus | null = null;
+  private pingReqId = 0;
+  // Maps an outstanding ping req_id to its send timestamp (performance.now()).
+  private readonly pendingPings = new Map<number, number>();
   private readonly options: KrakenConnectionOptions;
 
   constructor(options: KrakenConnectionOptions) {
@@ -54,6 +61,7 @@ export class KrakenConnection {
   disconnect(): void {
     const wasActive = this.ws !== null || this.reconnectTimer !== null;
     this.stopped = true;
+    this.stopPinging();
     if (this.reconnectTimer !== null) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -82,12 +90,15 @@ export class KrakenConnection {
       this.emitStatus('connected');
       ws.send(SUBSCRIBE_TICKER);
       ws.send(SUBSCRIBE_TRADE);
+      this.startPinging(ws);
     };
 
     ws.onmessage = (event: MessageEvent<unknown>) => {
-      if (typeof event.data === 'string') {
-        this.options.onMessage(event.data);
-      }
+      if (typeof event.data !== 'string') return;
+      // Pong frames are control messages, not market data: measure latency and
+      // do not forward them to the message parser.
+      if (this.tryHandlePong(event.data)) return;
+      this.options.onMessage(event.data);
     };
 
     ws.onerror = () => {
@@ -97,11 +108,61 @@ export class KrakenConnection {
     ws.onclose = () => {
       // Guard prevents a stale onclose from wiping a replacement socket created by a second openSocket() call.
       if (this.ws === ws) this.ws = null;
+      // Stop pinging and drop outstanding ping timestamps so a reconnect does not
+      // emit a bogus latency from a ping sent on the previous socket.
+      this.stopPinging();
       if (!this.stopped) {
         this.emitStatus('disconnected');
         this.scheduleReconnect();
       }
     };
+  }
+
+  private startPinging(ws: WebSocket): void {
+    this.stopPinging();
+    this.pingTimer = setInterval(() => {
+      if (ws.readyState !== WebSocket.OPEN) return;
+      const reqId = ++this.pingReqId;
+      this.pendingPings.set(reqId, performance.now());
+      ws.send(JSON.stringify({ method: 'ping', req_id: reqId }));
+    }, PING_INTERVAL_MS);
+  }
+
+  private stopPinging(): void {
+    if (this.pingTimer !== null) {
+      clearInterval(this.pingTimer);
+      this.pingTimer = null;
+    }
+    this.pendingPings.clear();
+  }
+
+  /**
+   * Detects a Kraken v2 pong frame (`{"method":"pong","req_id":N}`), reports the
+   * round-trip latency for the matching ping, and returns whether the frame was
+   * a pong. A malformed control frame is swallowed and treated as a non-pong.
+   */
+  private tryHandlePong(raw: string): boolean {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return false;
+    }
+    if (
+      typeof parsed !== 'object' ||
+      parsed === null ||
+      (parsed as { method?: unknown }).method !== 'pong'
+    ) {
+      return false;
+    }
+    const reqId = (parsed as { req_id?: unknown }).req_id;
+    if (typeof reqId !== 'number') return true;
+    const sentAt = this.pendingPings.get(reqId);
+    if (sentAt !== undefined) {
+      this.pendingPings.delete(reqId);
+      this.options.onLatency?.(performance.now() - sentAt);
+    }
+    return true;
   }
 
   private scheduleReconnect(): void {

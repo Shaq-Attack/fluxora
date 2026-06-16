@@ -9,6 +9,7 @@ interface KrakenAdapterOptions {
   onTicker: (tickers: Ticker[]) => void;
   onTrade: (trades: Trade[]) => void;
   onStatusChange: (status: ConnectionStatus) => void;
+  onLatency?: (ms: number) => void;
 }
 
 export class KrakenAdapter {
@@ -43,6 +44,7 @@ export class KrakenAdapter {
         }
       },
       onStatusChange: options.onStatusChange,
+      onLatency: (ms) => options.onLatency?.(ms),
     });
   }
 
