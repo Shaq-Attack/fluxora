@@ -4,3 +4,4 @@ export { PanelShell } from './components/PanelShell';
 export { StatDisplay } from './components/StatDisplay';
 export { PriceChange } from './components/PriceChange';
 export { ErrorFallback } from './components/ErrorFallback';
+export { FullscreenToggleButton } from './components/FullscreenToggleButton';
