@@ -6,6 +6,7 @@ export interface UseKrakenFeedOptions {
   onTicker: (tickers: Ticker[]) => void;
   onTrade: (trades: Trade[]) => void;
   onStatusChange: (status: ConnectionStatus) => void;
+  onLatency?: (ms: number) => void;
 }
 
 export function useKrakenFeed(options: UseKrakenFeedOptions): void {
@@ -17,6 +18,7 @@ export function useKrakenFeed(options: UseKrakenFeedOptions): void {
       onTicker: (tickers) => optionsRef.current.onTicker(tickers),
       onTrade: (trades) => optionsRef.current.onTrade(trades),
       onStatusChange: (status) => optionsRef.current.onStatusChange(status),
+      onLatency: (ms) => optionsRef.current.onLatency?.(ms),
     });
     adapter.start();
     return () => adapter.stop();
