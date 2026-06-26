@@ -17,7 +17,7 @@ export function FullscreenPanel({ id, children }: FullscreenPanelProps): JSX.Ele
   return (
     <div className={isFullscreen ? 'fixed inset-0 z-50 overflow-auto bg-surface p-3' : 'relative'}>
       {/* Fixed while fullscreen so the exit toggle stays viewport-anchored as content scrolls. */}
-      <div className={isFullscreen ? 'fixed right-3 top-3 z-10' : 'absolute right-2 top-2 z-10'}>
+      <div className={isFullscreen ? 'fixed right-3 top-3 z-30' : 'absolute right-2 top-2 z-30'}>
         <FullscreenToggleButton isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
       </div>
       {children}

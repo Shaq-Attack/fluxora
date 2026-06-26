@@ -1,13 +1,14 @@
 import { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Trade } from '@fluxora/types';
+import { PanelShell } from '@fluxora/ui';
 import { formatPrice, formatTime, formatQuantity } from '../lib/format';
 import { useMarketStore } from '../store/marketStore';
 
 interface TradeTapeProps {
   symbol: string;
-  // When true, render a capped recent window at natural height (no internal
-  // scroll) so the whole page can scroll. Used by the stacked mobile layout.
+  // When true, render a capped recent window (STACKED_TRADE_LIMIT rows) with a
+  // max-height cap and internal scroll instead of the full virtualised feed.
   fitContent?: boolean;
 }
 
@@ -48,11 +49,8 @@ function TradeTapeVirtualised({ trades }: { trades: Trade[] }): JSX.Element {
           return (
             <div
               key={virtualItem.key}
+              className="absolute left-0 top-0 w-full"
               style={{ /* @tanstack/react-virtual */
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
                 height: `${virtualItem.size}px`,
                 transform: `translateY(${virtualItem.start}px)`,
               }}
@@ -69,7 +67,7 @@ function TradeTapeVirtualised({ trades }: { trades: Trade[] }): JSX.Element {
 function TradeTapeFitted({ trades }: { trades: Trade[] }): JSX.Element {
   const visible = trades.slice(0, STACKED_TRADE_LIMIT);
   return (
-    <div className="flex flex-col py-1">
+    <div className="max-h-64 overflow-auto flex flex-col py-1">
       {visible.map((trade) => (
         <div key={`${trade.symbol}:${trade.id}`} className="py-0.5">
           <TradeRow trade={trade} />
@@ -83,10 +81,7 @@ export function TradeTape({ symbol, fitContent = false }: TradeTapeProps): JSX.E
   const trades = useMarketStore((s) => s.trades[symbol] ?? EMPTY_TRADES);
 
   return (
-    <div className="rounded-lg border border-border bg-surface-elevated">
-      <div className="flex items-center border-b border-border px-3 py-2">
-        <h2 className="text-sm font-semibold text-muted">{symbol} Trades</h2>
-      </div>
+    <PanelShell title={`${symbol} Trades`}>
       {trades.length === 0 ? (
         <p className="p-3 text-xs text-subtle">Waiting for data…</p>
       ) : fitContent ? (
@@ -94,6 +89,6 @@ export function TradeTape({ symbol, fitContent = false }: TradeTapeProps): JSX.E
       ) : (
         <TradeTapeVirtualised trades={trades} />
       )}
-    </div>
+    </PanelShell>
   );
 }

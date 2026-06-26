@@ -41,7 +41,7 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
 
   return (
     <div className="rounded-lg border border-border bg-surface-elevated p-4">
-      <h2 className="mb-3 text-sm font-semibold text-muted">{symbol} Order Entry</h2>
+      <h2 className="mb-3 pr-9 text-sm font-semibold text-muted">{symbol} Order Entry</h2>
 
       <div className="mb-3 flex gap-1">
         <button

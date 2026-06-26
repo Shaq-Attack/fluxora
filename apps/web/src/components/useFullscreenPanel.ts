@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { useLayoutStore } from '../store/layoutStore';
 
 interface UseFullscreenPanelResult {
@@ -13,13 +12,8 @@ interface UseFullscreenPanelResult {
  * the layout store). While fullscreen, pressing Escape exits.
  */
 export function useFullscreenPanel(id: string): UseFullscreenPanelResult {
-  const { fullscreenPanelId, setFullscreenPanel } = useLayoutStore(
-    useShallow((s) => ({
-      fullscreenPanelId: s.fullscreenPanelId,
-      setFullscreenPanel: s.setFullscreenPanel,
-    })),
-  );
-  const isFullscreen = fullscreenPanelId === id;
+  const isFullscreen = useLayoutStore((s) => s.fullscreenPanelId === id);
+  const setFullscreenPanel = useLayoutStore((s) => s.setFullscreenPanel);
 
   useEffect(() => {
     if (!isFullscreen) return;
