@@ -51,7 +51,7 @@ describe('TradeTape', () => {
 
   it('default (virtualised) mode still renders scrollable container', () => {
     const { container } = render(<TradeTape symbol={SYMBOL} />);
-    const scrollableContainer = container.querySelector('.h-64.overflow-auto');
+    const scrollableContainer = container.querySelector('[data-testid="trade-tape-feed"]');
     expect(scrollableContainer).not.toBeNull();
   });
 });

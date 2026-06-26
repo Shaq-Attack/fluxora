@@ -39,7 +39,7 @@ function TradeTapeVirtualised({ trades }: { trades: Trade[] }): JSX.Element {
   });
 
   return (
-    <div ref={parentRef} className="h-64 overflow-auto">
+    <div ref={parentRef} data-testid="trade-tape-feed" className="h-64 overflow-auto">
       {/* Inline styles here are required by @tanstack/react-virtual for absolute positioning */}
       <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
         {virtualizer.getVirtualItems().map((virtualItem) => {

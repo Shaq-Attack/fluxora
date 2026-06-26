@@ -95,6 +95,7 @@ describe('parseKrakenMessage', () => {
     expect(result).toBeNull();
   });
 
+  // XRP/USD is absent from the krakenSymbol enum; Zod rejects the datum and the parser returns null
   it('returns null for a ticker frame with an unknown symbol', () => {
     const raw = JSON.stringify({
       channel: 'ticker',
