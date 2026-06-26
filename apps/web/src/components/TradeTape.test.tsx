@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import { beforeEach, afterEach, describe, it, expect } from 'vitest';
 import type { Trade } from '@fluxora/types';
 import { useMarketStore } from '../store/marketStore';
@@ -20,13 +20,17 @@ function makeTrade(id: number): Trade {
 
 describe('TradeTape', () => {
   beforeEach(() => {
-    useMarketStore.setState({
-      trades: { [SYMBOL]: Array.from({ length: 20 }, (_, i) => makeTrade(i)) },
+    act(() => {
+      useMarketStore.setState({
+        trades: { [SYMBOL]: Array.from({ length: 20 }, (_, i) => makeTrade(i)) },
+      });
     });
   });
 
   afterEach(() => {
-    useMarketStore.setState({ trades: {} });
+    act(() => {
+      useMarketStore.setState({ trades: {} });
+    });
   });
 
   it('fitContent: trade list has overflow-auto so the panel height is bounded', () => {
