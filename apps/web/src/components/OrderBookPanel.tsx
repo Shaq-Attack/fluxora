@@ -1,3 +1,4 @@
+import { PanelShell } from '@fluxora/ui';
 import { useOrderBookPanel } from './useOrderBookPanel';
 import { useOrderBookStore } from '../store/orderBookStore';
 import type { OrderBookDepth, TickSize } from '../store/orderBookStore';
@@ -15,17 +16,17 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
 
   if (orderBook === undefined) {
     return (
-      <div className="rounded-lg border border-border bg-surface-elevated p-3">
+      <PanelShell className="p-3">
         <p className="text-xs text-subtle">Waiting for Order Book data…</p>
-      </div>
+      </PanelShell>
     );
   }
 
   const { bids: bidsWithDepth, asks: asksWithDepth } = orderBook;
 
   return (
-    <div className="rounded-lg border border-border bg-surface-elevated">
-      <div className="flex items-center gap-3 border-b border-border px-3 py-2">
+    <PanelShell>
+      <div className="flex items-center gap-3 border-b border-border px-3 py-2 pr-9">
         <span className="text-sm font-semibold text-muted">{symbol} Order Book</span>
         <div className="ml-auto flex items-center gap-2">
           <select
@@ -97,6 +98,6 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
           ))}
         </div>
       </div>
-    </div>
+    </PanelShell>
   );
 }

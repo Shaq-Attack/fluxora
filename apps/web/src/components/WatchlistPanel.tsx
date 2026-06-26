@@ -74,7 +74,7 @@ export function WatchlistPanel(): JSX.Element {
 
   return (
     <div className="rounded-lg border border-border bg-surface-elevated p-4">
-      <h2 className="mb-3 text-sm font-semibold text-muted">Watchlist</h2>
+      <h2 className="mb-3 pr-9 text-sm font-semibold text-muted">Watchlist</h2>
 
       {rows.length === 0 ? (
         <p className="text-xs text-subtle">No symbols.</p>

@@ -60,7 +60,7 @@ export function PortfolioPanel(): JSX.Element {
 
   return (
     <div className="rounded-lg border border-border bg-surface-elevated p-4">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between pr-9">
         <h2 className="text-sm font-semibold text-muted">Paper Trading Portfolio</h2>
         <button
           className="text-xs text-dim hover:text-red-400"

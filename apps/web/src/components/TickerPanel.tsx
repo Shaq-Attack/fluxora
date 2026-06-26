@@ -10,7 +10,7 @@ export function TickerPanel({ symbol }: TickerPanelProps): JSX.Element {
 
   return (
     <div className="rounded-lg border border-border bg-surface-elevated p-4">
-      <h2 className="mb-3 text-sm font-semibold text-muted">{symbol}</h2>
+      <h2 className="mb-3 pr-9 text-sm font-semibold text-muted">{symbol}</h2>
       <div className="grid grid-cols-3 gap-3">
         <div>
           <p className="text-xs text-dim">Bid</p>
