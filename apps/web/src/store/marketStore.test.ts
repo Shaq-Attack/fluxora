@@ -84,7 +84,9 @@ describe('useMarketStore', () => {
     const { addTrades } = useMarketStore.getState();
     // Send trades in ascending-id (oldest-first) order
     addTrades([makeTrade('BTC/USD', 1), makeTrade('BTC/USD', 2), makeTrade('BTC/USD', 3)]);
-    const stored = useMarketStore.getState().trades['BTC/USD']!;
+    const stored = useMarketStore.getState().trades['BTC/USD'];
+    expect(stored).toBeDefined();
+    if (!stored) return;
     // After reversal, the trade with id=3 should be at index 0
     expect(stored[0].id).toBe('3');
   });
@@ -93,7 +95,9 @@ describe('useMarketStore', () => {
     const { addTrades } = useMarketStore.getState();
     addTrades([makeTrade('BTC/USD', 1)]);
     addTrades([makeTrade('BTC/USD', 2)]);
-    const stored = useMarketStore.getState().trades['BTC/USD']!;
+    const stored = useMarketStore.getState().trades['BTC/USD'];
+    expect(stored).toBeDefined();
+    if (!stored) return;
     // Most-recent batch (id=2) reversed is just [id=2], prepended before [id=1]
     expect(stored[0].id).toBe('2');
     expect(stored[1].id).toBe('1');
@@ -105,7 +109,9 @@ describe('useMarketStore', () => {
     addTrades(Array.from({ length: 300 }, (_, i) => makeTrade('BTC/USD', i)));
     // Second batch of 201 — total attempted: 501
     addTrades(Array.from({ length: 201 }, (_, i) => makeTrade('BTC/USD', 300 + i)));
-    const stored = useMarketStore.getState().trades['BTC/USD']!;
+    const stored = useMarketStore.getState().trades['BTC/USD'];
+    expect(stored).toBeDefined();
+    if (!stored) return;
     expect(stored.length).toBe(500);
   });
 
@@ -117,8 +123,8 @@ describe('useMarketStore', () => {
       makeTrade('BTC/USD', 3),
     ]);
     const { trades } = useMarketStore.getState();
-    expect(trades['BTC/USD']!.length).toBe(2);
-    expect(trades['ETH/USD']!.length).toBe(1);
+    expect(trades['BTC/USD']?.length).toBe(2);
+    expect(trades['ETH/USD']?.length).toBe(1);
   });
 
   // setConnectionStatus

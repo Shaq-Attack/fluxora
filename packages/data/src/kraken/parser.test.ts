@@ -41,8 +41,9 @@ describe('parseKrakenMessage', () => {
     });
     const result = parseKrakenMessage(raw);
     expect(result).not.toBeNull();
-    expect(result!.kind).toBe('ticker');
-    if (result!.kind !== 'ticker') return;
+    if (result === null) return;
+    expect(result.kind).toBe('ticker');
+    if (result.kind !== 'ticker') return;
     expect(result.data[0].symbol).toBe('BTC/USD');
     expect(result.data[0].bid).toBe(50000);
     expect(result.data[0].ask).toBe(50001);
@@ -68,8 +69,9 @@ describe('parseKrakenMessage', () => {
     });
     const result = parseKrakenMessage(raw);
     expect(result).not.toBeNull();
-    expect(result!.kind).toBe('ticker');
-    if (result!.kind !== 'ticker') return;
+    if (result === null) return;
+    expect(result.kind).toBe('ticker');
+    if (result.kind !== 'ticker') return;
     expect(result.data[0].volume24h).toBe(100);
     expect(result.data[0].change24h).toBe(500);
     expect(result.data[0].changePercent24h).toBe(1.0);
@@ -135,8 +137,9 @@ describe('parseKrakenMessage', () => {
     });
     const result = parseKrakenMessage(raw);
     expect(result).not.toBeNull();
-    expect(result!.kind).toBe('trade');
-    if (result!.kind !== 'trade') return;
+    if (result === null) return;
+    expect(result.kind).toBe('trade');
+    if (result.kind !== 'trade') return;
     expect(result.data[0].id).toBe('999');
     expect(result.data[0].symbol).toBe('BTC/USD');
     expect(result.data[0].price).toBe(50000);
@@ -171,8 +174,9 @@ describe('parseKrakenMessage', () => {
     });
     const result = parseKrakenMessage(raw);
     expect(result).not.toBeNull();
-    expect(result!.kind).toBe('trade');
-    if (result!.kind !== 'trade') return;
+    if (result === null) return;
+    expect(result.kind).toBe('trade');
+    if (result.kind !== 'trade') return;
     expect(result.data.length).toBe(2);
   });
 
