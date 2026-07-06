@@ -17,8 +17,8 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
 
   if (orderBook === undefined) {
     return (
-      <PanelShell>
-        <div className="flex items-center gap-3 border-b border-border px-3 py-2 pr-9">
+      <PanelShell fill>
+        <div className="flex shrink-0 items-center gap-3 border-b border-border px-3 py-2 pr-9">
           <span className="text-sm font-semibold text-muted">{symbol} Order Book</span>
         </div>
         <div aria-label="Loading order book" className="grid grid-cols-2 gap-px bg-border" role="status">
@@ -40,9 +40,9 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
   const { bids: bidsWithDepth, asks: asksWithDepth } = orderBook;
 
   return (
-    <PanelShell className="relative">
+    <PanelShell fill className="relative">
       <StaleFeedOverlay />
-      <div className="flex items-center gap-3 border-b border-border px-3 py-2 pr-9">
+      <div className="flex shrink-0 items-center gap-3 border-b border-border px-3 py-2 pr-9">
         <span className="text-sm font-semibold text-muted">{symbol} Order Book</span>
         <div className="ml-auto flex items-center gap-2">
           <select
@@ -66,7 +66,7 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
           </select>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-px bg-border">
+      <div className="grid min-h-0 flex-1 content-start grid-cols-2 gap-px overflow-auto bg-border">
         <div className="bg-surface-elevated">
           <div className="grid grid-cols-2 gap-1 px-3 py-1">
             <span className="text-xs text-dim">Price</span>
