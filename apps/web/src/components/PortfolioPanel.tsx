@@ -13,7 +13,7 @@ function formatPnl(pnl: number): string {
 
 function PositionsTable({ rows }: { rows: PositionRow[] }): JSX.Element {
   return (
-    <div className="mt-3 overflow-x-auto">
+    <div className="overflow-x-auto">
       <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-border text-left text-dim">
@@ -59,8 +59,8 @@ export function PortfolioPanel(): JSX.Element {
   const isEmpty = positionRows.length === 0 && pendingOrders.length === 0;
 
   return (
-    <div className="rounded-lg border border-border bg-surface-elevated p-4">
-      <div className="mb-3 flex items-center justify-between pr-9">
+    <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-surface-elevated p-4">
+      <div className="mb-3 flex shrink-0 items-center justify-between pr-9">
         <h2 className="text-sm font-semibold text-muted">Paper Trading Portfolio</h2>
         <button
           className="text-xs text-dim hover:text-red-400"
@@ -71,7 +71,7 @@ export function PortfolioPanel(): JSX.Element {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid shrink-0 grid-cols-3 gap-3">
         <div>
           <p className="text-xs text-dim">Cash</p>
           <p className="font-mono text-sm tabular-nums text-primary">${formatPrice(cashBalance)}</p>
@@ -91,7 +91,7 @@ export function PortfolioPanel(): JSX.Element {
       {isEmpty ? (
         <p className="mt-3 text-xs text-subtle">No open positions.</p>
       ) : (
-        <>
+        <div className="mt-3 min-h-0 flex-1 overflow-auto">
           {positionRows.length > 0 && <PositionsTable rows={positionRows} />}
 
           {pendingOrders.length > 0 && (
@@ -125,7 +125,7 @@ export function PortfolioPanel(): JSX.Element {
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
