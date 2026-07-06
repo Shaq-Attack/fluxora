@@ -46,7 +46,7 @@ export function DashboardGrid({ activeSymbol }: DashboardGridProps): JSX.Element
         </FullscreenPanel>
         <FullscreenPanel id="trades">
           <PanelErrorBoundary name="trade tape">
-            <TradeTape symbol={activeSymbol} fitContent />
+            <TradeTape symbol={activeSymbol} />
           </PanelErrorBoundary>
         </FullscreenPanel>
         <FullscreenPanel id="order-entry">

@@ -8,13 +8,9 @@ import { StaleFeedOverlay } from './StaleFeedOverlay';
 
 interface TradeTapeProps {
   symbol: string;
-  // When true, render a capped recent window (STACKED_TRADE_LIMIT rows) with a
-  // max-height cap and internal scroll instead of the full virtualised feed.
-  fitContent?: boolean;
 }
 
 const ROW_HEIGHT = 28;
-const STACKED_TRADE_LIMIT = 40;
 const EMPTY_TRADES: Trade[] = [];
 
 function TradeRow({ trade }: { trade: Trade }): JSX.Element {
@@ -40,7 +36,11 @@ function TradeTapeVirtualised({ trades }: { trades: Trade[] }): JSX.Element {
   });
 
   return (
-    <div ref={parentRef} data-testid="trade-tape-feed" className="h-64 overflow-auto">
+    <div
+      ref={parentRef}
+      data-testid="trade-tape-feed"
+      className="h-64 overflow-auto lg:h-auto lg:min-h-0 lg:flex-1"
+    >
       {/* Inline styles here are required by @tanstack/react-virtual for absolute positioning */}
       <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
         {virtualizer.getVirtualItems().map((virtualItem) => {
@@ -65,19 +65,6 @@ function TradeTapeVirtualised({ trades }: { trades: Trade[] }): JSX.Element {
   );
 }
 
-function TradeTapeFitted({ trades }: { trades: Trade[] }): JSX.Element {
-  const visible = trades.slice(0, STACKED_TRADE_LIMIT);
-  return (
-    <div className="max-h-64 overflow-auto flex flex-col py-1">
-      {visible.map((trade) => (
-        <div key={`${trade.symbol}:${trade.id}`} className="py-0.5">
-          <TradeRow trade={trade} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function TradeTapeSkeleton(): JSX.Element {
   return (
     <div aria-label="Loading trades" className="flex flex-col gap-2 p-3" role="status">
@@ -93,19 +80,13 @@ function TradeTapeSkeleton(): JSX.Element {
   );
 }
 
-export function TradeTape({ symbol, fitContent = false }: TradeTapeProps): JSX.Element {
+export function TradeTape({ symbol }: TradeTapeProps): JSX.Element {
   const trades = useMarketStore((s) => s.trades[symbol] ?? EMPTY_TRADES);
 
   return (
-    <PanelShell className="relative" title={`${symbol} Trades`}>
+    <PanelShell fill className="relative" title={`${symbol} Trades`}>
       {trades.length > 0 && <StaleFeedOverlay />}
-      {trades.length === 0 ? (
-        <TradeTapeSkeleton />
-      ) : fitContent ? (
-        <TradeTapeFitted trades={trades} />
-      ) : (
-        <TradeTapeVirtualised trades={trades} />
-      )}
+      {trades.length === 0 ? <TradeTapeSkeleton /> : <TradeTapeVirtualised trades={trades} />}
     </PanelShell>
   );
 }

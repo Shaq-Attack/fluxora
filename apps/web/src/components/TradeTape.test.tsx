@@ -33,25 +33,28 @@ describe('TradeTape', () => {
     });
   });
 
-  it('fitContent: trade list has overflow-auto so the panel height is bounded', () => {
-    const { container } = render(<TradeTape symbol={SYMBOL} fitContent />);
-    // The scrollable list container must carry overflow-auto so the panel cannot
-    // grow to unbounded height as trades accumulate.
-    const scrollableList = container.querySelector('.overflow-auto');
-    expect(scrollableList).not.toBeNull();
-  });
-
-  it('fitContent: trade list has a max-height cap', () => {
-    const { container } = render(<TradeTape symbol={SYMBOL} fitContent />);
-    // Without a max-h-* class, the panel grows to ~1 280 px (40 rows × 32 px)
-    // and pushes all panels below it off-screen.
-    const listEl = container.querySelector('[class*="max-h-"]');
-    expect(listEl).not.toBeNull();
-  });
-
-  it('default (virtualised) mode still renders scrollable container', () => {
+  it('reserves a fixed base height so streaming trades cannot shift the layout', () => {
     const { container } = render(<TradeTape symbol={SYMBOL} />);
-    const scrollableContainer = container.querySelector('[data-testid="trade-tape-feed"]');
-    expect(scrollableContainer).not.toBeNull();
+    const feed = container.querySelector('[data-testid="trade-tape-feed"]');
+    expect(feed).not.toBeNull();
+    // h-64 below lg: the panel occupies the same space before and after trades
+    // arrive, so nothing below it moves. overflow-auto keeps growth internal.
+    expect(feed?.className).toContain('h-64');
+    expect(feed?.className).toContain('overflow-auto');
+  });
+
+  it('fills its flex share on large screens', () => {
+    const { container } = render(<TradeTape symbol={SYMBOL} />);
+    const feed = container.querySelector('[data-testid="trade-tape-feed"]');
+    expect(feed?.className).toContain('lg:flex-1');
+    expect(feed?.className).toContain('lg:min-h-0');
+  });
+
+  it('renders a loading skeleton while no trades have arrived', () => {
+    act(() => {
+      useMarketStore.setState({ trades: {} });
+    });
+    const { getByRole } = render(<TradeTape symbol={SYMBOL} />);
+    expect(getByRole('status')).toBeDefined();
   });
 });
