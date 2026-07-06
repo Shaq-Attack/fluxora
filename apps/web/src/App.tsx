@@ -43,15 +43,17 @@ function App(): JSX.Element {
   });
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface text-primary">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-surface px-4 py-3">
+    <div className="flex h-screen flex-col overflow-hidden bg-surface text-primary">
+      <header className="flex shrink-0 items-center justify-between border-b border-border bg-surface px-4 py-3">
         <h1 className="text-lg font-semibold tracking-tight">Fluxora</h1>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <ConnectionBadge />
         </div>
       </header>
-      <DashboardGrid activeSymbol={activeSymbol} />
+      <main className="min-h-0 flex-1 overflow-y-auto">
+        <DashboardGrid activeSymbol={activeSymbol} />
+      </main>
       <ToastViewport />
     </div>
   );

@@ -13,48 +13,50 @@ interface DashboardGridProps {
 }
 
 /**
- * Single scrolling page. Panels size to their content and the whole page
- * scrolls to reach the lower ones — no per-panel scroll trapping. A responsive
- * two-column grid uses the horizontal space on wide screens (Tailwind only, no
- * JS breakpoint logic) and collapses to one column on narrow screens.
+ * Viewport-locked at lg+: the grid fills the area under the header exactly and
+ * data-dense panels (order book, trades, portfolio) scroll internally, so every
+ * panel stays on screen with no page scroll and no layout shift as data
+ * streams in. Below lg it remains a single content-sized scrolling column. The
+ * min-height floor lets very short viewports fall back to page scroll instead
+ * of crushing panels. Tailwind only — no JS breakpoint logic.
  */
 export function DashboardGrid({ activeSymbol }: DashboardGridProps): JSX.Element {
   return (
-    <div className="grid grid-cols-1 gap-2 p-2 lg:grid-cols-2">
-      <div className="flex flex-col gap-2">
-        <FullscreenPanel id="watchlist">
+    <div className="grid grid-cols-1 gap-2 p-2 lg:h-full lg:min-h-[640px] lg:grid-cols-2">
+      <div className="flex min-h-0 flex-col gap-2">
+        <FullscreenPanel className="shrink-0" id="watchlist">
           <PanelErrorBoundary name="watchlist">
             <WatchlistPanel />
           </PanelErrorBoundary>
         </FullscreenPanel>
-        <FullscreenPanel id="ticker">
+        <FullscreenPanel className="shrink-0" id="ticker">
           <PanelErrorBoundary name="ticker">
             <TickerPanel symbol={activeSymbol} />
           </PanelErrorBoundary>
         </FullscreenPanel>
-        <FullscreenPanel id="order-book">
+        <FullscreenPanel className="lg:flex-1" id="order-book">
           <PanelErrorBoundary name="order book">
             <OrderBookPanel key={activeSymbol} symbol={activeSymbol} />
           </PanelErrorBoundary>
         </FullscreenPanel>
       </div>
-      <div className="flex flex-col gap-2">
-        <FullscreenPanel id="chart">
+      <div className="flex min-h-0 flex-col gap-2">
+        <FullscreenPanel className="lg:flex-[3]" id="chart">
           <PanelErrorBoundary name="chart">
             <CandlestickChartPanel symbol={activeSymbol} />
           </PanelErrorBoundary>
         </FullscreenPanel>
-        <FullscreenPanel id="trades">
+        <FullscreenPanel className="lg:flex-[2]" id="trades">
           <PanelErrorBoundary name="trade tape">
             <TradeTape symbol={activeSymbol} />
           </PanelErrorBoundary>
         </FullscreenPanel>
-        <FullscreenPanel id="order-entry">
+        <FullscreenPanel className="shrink-0" id="order-entry">
           <PanelErrorBoundary name="order entry">
             <OrderEntryPanel symbol={activeSymbol} />
           </PanelErrorBoundary>
         </FullscreenPanel>
-        <FullscreenPanel id="portfolio">
+        <FullscreenPanel className="lg:flex-[2]" id="portfolio">
           <PanelErrorBoundary name="portfolio">
             <PortfolioPanel />
           </PanelErrorBoundary>
