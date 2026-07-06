@@ -1,9 +1,11 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import type { OrderSide, OrderType, Ticker } from '@fluxora/types';
+import { formatPrice, formatQuantity } from '../lib/format';
 import { useMarketStore } from '../store/marketStore';
 import { usePaperTradingStore } from '../store/paperTradingStore';
 import { useLayoutStore } from '../store/layoutStore';
+import { pushToast } from '../store/toastStore';
 
 interface FormState {
   side: OrderSide;
@@ -11,7 +13,6 @@ interface FormState {
   qty: string;
   limitPrice: string;
   error: string | null;
-  successMsg: string | null;
 }
 
 interface FormHandlers {
@@ -42,8 +43,6 @@ export function useOrderEntryPanel(symbol: string): UseOrderEntryPanelResult {
   const [qty, setQty] = useState('');
   const [limitPrice, setLimitPrice] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { cashBalance, positions, submitOrder } = usePaperTradingStore(
     useShallow((s) => ({
@@ -60,12 +59,6 @@ export function useOrderEntryPanel(symbol: string): UseOrderEntryPanelResult {
   useEffect(() => {
     setSide(orderEntrySide);
   }, [orderEntrySide]);
-
-  useEffect(() => {
-    return () => {
-      if (successTimerRef.current !== null) clearTimeout(successTimerRef.current);
-    };
-  }, []);
 
   const handleSideChange = useCallback((newSide: OrderSide) => {
     setSide(newSide);
@@ -134,14 +127,17 @@ export function useOrderEntryPanel(symbol: string): UseOrderEntryPanelResult {
     setQty('');
     setLimitPrice('');
     setError(null);
-    setSuccessMsg(orderType === 'market' ? 'Order filled' : 'Limit order placed');
-
-    if (successTimerRef.current !== null) clearTimeout(successTimerRef.current);
-    successTimerRef.current = setTimeout(() => setSuccessMsg(null), 2000);
+    pushToast({
+      variant: 'success',
+      message:
+        orderType === 'market'
+          ? `${side === 'buy' ? 'Bought' : 'Sold'} ${formatQuantity(parsedQty)} ${symbol} @ $${formatPrice(ticker.price)}`
+          : `Limit ${side} placed: ${formatQuantity(parsedQty)} ${symbol} @ $${formatPrice(parsedLimitPrice)}`,
+    });
   }, [ticker, qty, limitPrice, orderType, side, symbol, submitOrder]);
 
   return {
-    form: { side, orderType, qty, limitPrice, error, successMsg },
+    form: { side, orderType, qty, limitPrice, error },
     handlers: {
       handleSideChange,
       handleOrderTypeChange,

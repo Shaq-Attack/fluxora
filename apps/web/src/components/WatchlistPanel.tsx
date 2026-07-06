@@ -1,3 +1,4 @@
+import { PriceChange, Skeleton } from '@fluxora/ui';
 import { formatPrice } from '../lib/format';
 import { useWatchlistPanel } from './useWatchlistPanel';
 import type { WatchlistRow } from './useWatchlistPanel';
@@ -36,9 +37,11 @@ function WatchlistRowItem({
     >
       <span className="text-xs font-medium text-primary">{row.symbol}</span>
       <div className="flex items-center gap-3">
-        <span className="font-mono text-xs tabular-nums text-muted">
-          {row.lastPrice !== null ? `$${formatPrice(row.lastPrice)}` : '—'}
-        </span>
+        {row.lastPrice !== null ? (
+          <PriceChange className="text-xs" value={`$${formatPrice(row.lastPrice)}`} />
+        ) : (
+          <Skeleton className="h-3 w-14" />
+        )}
         <span className={`font-mono text-xs tabular-nums ${changeClass(row.changePercent24h)}`}>
           {formatChange(row.changePercent24h)}
         </span>

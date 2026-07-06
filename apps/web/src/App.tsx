@@ -4,7 +4,10 @@ import { useKrakenFeed } from '@fluxora/data';
 import { ConnectionBadge } from './components/ConnectionBadge';
 import { DashboardGrid } from './components/DashboardGrid';
 import { ThemeToggle } from './components/ThemeToggle';
+import { ToastViewport } from './components/ToastViewport';
+import { useConnectionToasts } from './hooks/useConnectionToasts';
 import { useLimitOrderFill } from './hooks/useLimitOrderFill';
+import { useOrderFillToasts } from './hooks/useOrderFillToasts';
 import { reportWsLatency } from './lib/metrics';
 import { useLayoutStore } from './store/layoutStore';
 import { useMarketStore } from './store/marketStore';
@@ -27,6 +30,8 @@ function App(): JSX.Element {
   });
 
   useLimitOrderFill();
+  useConnectionToasts();
+  useOrderFillToasts();
 
   useHotkeys('b', () => useLayoutStore.getState().setOrderEntrySide('buy'), {
     preventDefault: true,
@@ -47,6 +52,7 @@ function App(): JSX.Element {
         </div>
       </header>
       <DashboardGrid activeSymbol={activeSymbol} />
+      <ToastViewport />
     </div>
   );
 }

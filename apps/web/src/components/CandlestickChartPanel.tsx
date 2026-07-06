@@ -1,5 +1,6 @@
 import { CandlestickChart } from '@fluxora/charts';
 import type { Timeframe } from '@fluxora/types';
+import { Skeleton } from '@fluxora/ui';
 import { useCandlestickChartPanel } from './useCandlestickChartPanel';
 
 interface CandlestickChartPanelProps {
@@ -88,8 +89,8 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
           <p className="text-xs text-red-400">Failed to load chart data for {symbol}.</p>
         </div>
       ) : isLoading && !hasCandles ? (
-        <div className="px-3 py-3">
-          <p className="text-xs text-subtle">Loading chart…</p>
+        <div aria-label="Loading chart" className="h-72 p-3" role="status">
+          <Skeleton className="h-full w-full" />
         </div>
       ) : (
         <>

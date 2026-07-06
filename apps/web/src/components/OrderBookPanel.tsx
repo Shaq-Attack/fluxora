@@ -1,4 +1,5 @@
-import { PanelShell } from '@fluxora/ui';
+import { PanelShell, Skeleton } from '@fluxora/ui';
+import { StaleFeedOverlay } from './StaleFeedOverlay';
 import { useOrderBookPanel } from './useOrderBookPanel';
 import { useOrderBookStore } from '../store/orderBookStore';
 import type { OrderBookDepth, TickSize } from '../store/orderBookStore';
@@ -16,8 +17,22 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
 
   if (orderBook === undefined) {
     return (
-      <PanelShell className="p-3">
-        <p className="text-xs text-subtle">Waiting for Order Book data…</p>
+      <PanelShell>
+        <div className="flex items-center gap-3 border-b border-border px-3 py-2 pr-9">
+          <span className="text-sm font-semibold text-muted">{symbol} Order Book</span>
+        </div>
+        <div aria-label="Loading order book" className="grid grid-cols-2 gap-px bg-border" role="status">
+          {[0, 1].map((col) => (
+            <div key={col} className="bg-surface-elevated px-3 py-1">
+              {Array.from({ length: 8 }, (_, i) => (
+                <div key={i} className="grid grid-cols-2 gap-1 py-1">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-3 w-12 justify-self-end" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </PanelShell>
     );
   }
@@ -25,7 +40,8 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
   const { bids: bidsWithDepth, asks: asksWithDepth } = orderBook;
 
   return (
-    <PanelShell>
+    <PanelShell className="relative">
+      <StaleFeedOverlay />
       <div className="flex items-center gap-3 border-b border-border px-3 py-2 pr-9">
         <span className="text-sm font-semibold text-muted">{symbol} Order Book</span>
         <div className="ml-auto flex items-center gap-2">

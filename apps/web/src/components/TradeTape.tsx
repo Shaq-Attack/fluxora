@@ -1,9 +1,10 @@
 import { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Trade } from '@fluxora/types';
-import { PanelShell } from '@fluxora/ui';
+import { PanelShell, Skeleton } from '@fluxora/ui';
 import { formatPrice, formatTime, formatQuantity } from '../lib/format';
 import { useMarketStore } from '../store/marketStore';
+import { StaleFeedOverlay } from './StaleFeedOverlay';
 
 interface TradeTapeProps {
   symbol: string;
@@ -77,13 +78,29 @@ function TradeTapeFitted({ trades }: { trades: Trade[] }): JSX.Element {
   );
 }
 
+function TradeTapeSkeleton(): JSX.Element {
+  return (
+    <div aria-label="Loading trades" className="flex flex-col gap-2 p-3" role="status">
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-3 w-4" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function TradeTape({ symbol, fitContent = false }: TradeTapeProps): JSX.Element {
   const trades = useMarketStore((s) => s.trades[symbol] ?? EMPTY_TRADES);
 
   return (
-    <PanelShell title={`${symbol} Trades`}>
+    <PanelShell className="relative" title={`${symbol} Trades`}>
+      {trades.length > 0 && <StaleFeedOverlay />}
       {trades.length === 0 ? (
-        <p className="p-3 text-xs text-subtle">Waiting for data…</p>
+        <TradeTapeSkeleton />
       ) : fitContent ? (
         <TradeTapeFitted trades={trades} />
       ) : (

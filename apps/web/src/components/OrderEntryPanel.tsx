@@ -15,7 +15,7 @@ const QUICK_FILL_PCTS: { label: string; value: number }[] = [
 
 export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
   const { form, handlers, data } = useOrderEntryPanel(symbol);
-  const { side, orderType, qty, limitPrice, error, successMsg } = form;
+  const { side, orderType, qty, limitPrice, error } = form;
   const {
     handleSideChange,
     handleOrderTypeChange,
@@ -135,7 +135,6 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
       </button>
 
       {error !== null && <p className="mt-1 text-xs text-red-400">{error}</p>}
-      {successMsg !== null && <p className="mt-1 text-xs text-green-400">{successMsg}</p>}
     </div>
   );
 }
