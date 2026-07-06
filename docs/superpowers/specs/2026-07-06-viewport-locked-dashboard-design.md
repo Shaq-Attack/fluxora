@@ -58,16 +58,18 @@ is retained: seven panels cannot fit a phone viewport.
 
 ## Component changes
 
-- **`PanelShell` (`packages/ui`)**: gains a fill mode — root becomes
-  `flex min-h-0 flex-col`; the body wraps children in a
-  `flex-1 min-h-0 overflow-auto` region so the title bar stays pinned while
-  content scrolls.
+- **`PanelShell` (`packages/ui`)**: gains a `fill` prop — root becomes
+  `flex min-h-0 flex-1 flex-col` and the title bar is pinned with `shrink-0`.
+  Scrolling stays with each panel's own content region (not the shell),
+  because the trade-tape virtualiser must own its scroll element.
 - **`FullscreenPanel`**: the non-fullscreen wrapper becomes a flex participant
-  (`flex min-h-0 flex-col`) so column height flows through to the wrapped
-  panel. Fullscreen overlay behaviour unchanged.
-- **`TradeTape`**: dashboard uses the virtualised variant filling its container
-  (`h-full` replaces the hard-coded `h-64`). The `fitContent` stacked variant
-  is removed — nothing needs it any more.
+  (`relative flex min-h-0 flex-col`) with a `className` prop for per-panel
+  sizing; the fullscreen overlay becomes a flex column so fill-mode children
+  fill it.
+- **`TradeTape`**: the virtualised feed keeps a fixed `h-64` base below `lg`
+  (reserved space — no layout shift on any screen size) and fills its flex
+  share at `lg+` (`lg:h-auto lg:min-h-0 lg:flex-1`). The `fitContent` stacked
+  variant is removed — nothing needs it any more.
 - **`CandlestickChartPanel`**: chart body becomes `h-72 lg:h-auto lg:flex-1`
   with the panel root as a full-height flex column. Verify during
   implementation that `CandlestickChart` (lightweight-charts) resizes with its
