@@ -31,8 +31,8 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
   }
 
   return (
-    <div className="rounded-lg border border-border bg-surface-elevated">
-      <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2 pr-9">
+    <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-surface-elevated">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-3 py-2 pr-9">
         <span className="text-sm font-semibold text-muted">
           {symbol} · {timeframe}
         </span>
@@ -89,7 +89,7 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
           <p className="text-xs text-red-400">Failed to load chart data for {symbol}.</p>
         </div>
       ) : isLoading && !hasCandles ? (
-        <div aria-label="Loading chart" className="h-72 p-3" role="status">
+        <div aria-label="Loading chart" className="h-72 p-3 lg:h-auto lg:min-h-0 lg:flex-1" role="status">
           <Skeleton className="h-full w-full" />
         </div>
       ) : (
@@ -99,7 +99,7 @@ export function CandlestickChartPanel({ symbol }: CandlestickChartPanelProps): J
               History refresh failed — showing live data.
             </p>
           )}
-          <div className="h-72">
+          <div className="h-72 lg:h-auto lg:min-h-0 lg:flex-1">
             <CandlestickChart
               candles={historicalCandles}
               streamCandle={streamCandle}
