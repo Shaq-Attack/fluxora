@@ -86,20 +86,19 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
           type="number"
           value={qty}
         />
-        {ticker !== undefined && (
-          <div className="mt-1 flex gap-1">
-            {QUICK_FILL_PCTS.map(({ label, value }) => (
-              <button
-                className="flex-1 rounded bg-surface-strong px-1 py-0.5 text-xs text-dim hover:bg-border"
-                key={label}
-                onClick={() => handleQuickFill(value)}
-                type="button"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="mt-1 flex gap-1">
+          {QUICK_FILL_PCTS.map(({ label, value }) => (
+            <button
+              className="flex-1 rounded bg-surface-strong px-1 py-0.5 text-xs text-dim hover:bg-border disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={ticker === undefined}
+              key={label}
+              onClick={() => handleQuickFill(value)}
+              type="button"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {orderType === 'limit' && (
@@ -115,15 +114,16 @@ export function OrderEntryPanel({ symbol }: OrderEntryPanelProps): JSX.Element {
         </div>
       )}
 
-      {ticker !== undefined && (
-        <p className="mb-2 text-xs text-dim">
-          Last: <span className="font-mono text-muted">${formatPrice(ticker.price)}</span>
-          {' · '}
-          {side === 'buy'
-            ? `Cash: $${formatPrice(cashBalance)}`
-            : `Position: ${positionQty.toFixed(6)}`}
-        </p>
-      )}
+      <p className="mb-2 text-xs text-dim">
+        Last:{' '}
+        <span className="font-mono text-muted">
+          {ticker !== undefined ? `$${formatPrice(ticker.price)}` : '—'}
+        </span>
+        {' · '}
+        {side === 'buy'
+          ? `Cash: $${formatPrice(cashBalance)}`
+          : `Position: ${positionQty.toFixed(6)}`}
+      </p>
 
       <button
         className={submitClass}
