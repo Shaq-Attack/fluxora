@@ -97,14 +97,39 @@ describe('parseKrakenMessage', () => {
     expect(result).toBeNull();
   });
 
-  // XRP/USD is absent from the krakenSymbol enum; Zod rejects the datum and the parser returns null
-  it('returns null for a ticker frame with an unknown symbol', () => {
+  // The symbol whitelist was removed so watchlist-driven symbols (anything the
+  // user subscribes to, not just the original BTC/USD, ETH/USD pair) parse.
+  it('parses a ticker frame for a symbol outside the original hardcoded pair', () => {
     const raw = JSON.stringify({
       channel: 'ticker',
       type: 'snapshot',
       data: [
         {
-          symbol: 'XRP/USD',
+          symbol: 'SOL/USD',
+          bid: 80,
+          ask: 80.1,
+          last: 80.05,
+          volume: 10000,
+          change: 0.5,
+          change_pct: 0.6,
+        },
+      ],
+    });
+    const result = parseKrakenMessage(raw);
+    expect(result).not.toBeNull();
+    if (result === null) return;
+    expect(result.kind).toBe('ticker');
+    if (result.kind !== 'ticker') return;
+    expect(result.data[0].symbol).toBe('SOL/USD');
+  });
+
+  it('returns null for a ticker frame with a malformed symbol (no slash)', () => {
+    const raw = JSON.stringify({
+      channel: 'ticker',
+      type: 'snapshot',
+      data: [
+        {
+          symbol: 'SOLUSD',
           bid: 1,
           ask: 1.01,
           last: 1.005,

@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import type { Ticker, Trade } from '@fluxora/types';
 
-const krakenSymbol = z.enum(['BTC/USD', 'ETH/USD']);
+// Any BASE/QUOTE pair, not just the hardcoded BTC/USD, ETH/USD set — the
+// watchlist can subscribe to arbitrary symbols at runtime.
+const krakenSymbol = z.string().regex(/^[A-Z0-9]+\/[A-Z0-9]+$/);
 
 const channelFrameSchema = z.object({
   channel: z.string(),
