@@ -13,6 +13,6 @@ export type { UseKrakenTickerSnapshotResult } from './hooks/useKrakenTickerSnaps
 export { useKrakenDepthSnapshot } from './hooks/useKrakenDepthSnapshot';
 export type { UseKrakenDepthSnapshotResult } from './hooks/useKrakenDepthSnapshot';
 
-export { fetchKrakenTickerSnapshot } from './kraken/restTicker';
+export { fetchKrakenTickerSnapshot, isKrakenPairSupported } from './kraken/restTicker';
 export { fetchKrakenCandles } from './kraken/restCandles';
 export { fetchKrakenDepthSnapshot } from './kraken/restDepth';

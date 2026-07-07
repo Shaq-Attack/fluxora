@@ -64,3 +64,18 @@ export async function fetchKrakenTickerSnapshot(symbol: string): Promise<Ticker>
     timestamp: Date.now(),
   };
 }
+
+/**
+ * Probes Kraken for a symbol's validity by attempting a ticker fetch. Used to
+ * reject unsupported pairs (e.g. BTC/ZAR, which Kraken doesn't list) at the
+ * point the user adds them to the watchlist, rather than failing silently
+ * downstream in every panel.
+ */
+export async function isKrakenPairSupported(symbol: string): Promise<boolean> {
+  try {
+    await fetchKrakenTickerSnapshot(symbol);
+    return true;
+  } catch {
+    return false;
+  }
+}
