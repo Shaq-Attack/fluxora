@@ -2,11 +2,9 @@ import { Toast } from '@fluxora/ui';
 import { useToastStore } from '../store/toastStore';
 
 /** Fixed bottom-right stack of transient notifications. Sits above fullscreen panels (z-50). */
-export function ToastViewport(): JSX.Element | null {
+export function ToastViewport(): JSX.Element {
   const toasts = useToastStore((s) => s.toasts);
   const dismissToast = useToastStore((s) => s.dismissToast);
-
-  if (toasts.length === 0) return null;
 
   return (
     <div
