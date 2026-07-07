@@ -57,4 +57,14 @@ describe('TradeTape', () => {
     const { getByRole } = render(<TradeTape symbol={SYMBOL} />);
     expect(getByRole('status')).toBeDefined();
   });
+
+  it('reserves the same base height in the skeleton state so the first trade cannot shift the layout', () => {
+    act(() => {
+      useMarketStore.setState({ trades: {} });
+    });
+    const { getByRole } = render(<TradeTape symbol={SYMBOL} />);
+    const skeleton = getByRole('status');
+    expect(skeleton.className).toContain('h-64');
+    expect(skeleton.className).toContain('lg:flex-1');
+  });
 });

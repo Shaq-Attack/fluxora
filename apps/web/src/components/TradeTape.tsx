@@ -67,7 +67,11 @@ function TradeTapeVirtualised({ trades }: { trades: Trade[] }): JSX.Element {
 
 function TradeTapeSkeleton(): JSX.Element {
   return (
-    <div aria-label="Loading trades" className="flex flex-col gap-2 p-3" role="status">
+    <div
+      aria-label="Loading trades"
+      className="flex h-64 flex-col gap-2 overflow-hidden p-3 lg:h-auto lg:min-h-0 lg:flex-1"
+      role="status"
+    >
       {Array.from({ length: 6 }, (_, i) => (
         <div key={i} className="flex items-center gap-3">
           <Skeleton className="h-3 w-16" />
