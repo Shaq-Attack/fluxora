@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { isKrakenPairSupported } from '@fluxora/data';
 import { useMarketStore } from '../store/marketStore';
 import { useWatchlistStore } from '../store/watchlistStore';
 
@@ -13,6 +14,8 @@ export interface WatchlistRow {
 export interface UseWatchlistPanelResult {
   rows: WatchlistRow[];
   inputValue: string;
+  isValidating: boolean;
+  addError: string | null;
   handleSelectSymbol: (symbol: string) => void;
   handleAddSymbol: () => void;
   handleRemoveSymbol: (symbol: string) => void;
@@ -37,6 +40,8 @@ export function useWatchlistPanel(): UseWatchlistPanelResult {
   );
 
   const [inputValue, setInputValue] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
   const rows: WatchlistRow[] = watchlist.map((symbol) => {
     const ticker = tickers[symbol];
@@ -58,8 +63,17 @@ export function useWatchlistPanel(): UseWatchlistPanelResult {
   const handleAddSymbol = useCallback((): void => {
     const trimmed = inputValue.trim().toUpperCase();
     if (trimmed.length === 0) return;
-    addSymbol(trimmed);
-    setInputValue('');
+    setAddError(null);
+    setIsValidating(true);
+    void isKrakenPairSupported(trimmed).then((supported) => {
+      setIsValidating(false);
+      if (!supported) {
+        setAddError(`${trimmed} is not a supported pair at this time.`);
+        return;
+      }
+      addSymbol(trimmed);
+      setInputValue('');
+    });
   }, [inputValue, addSymbol]);
 
   const handleRemoveSymbol = useCallback(
@@ -71,11 +85,14 @@ export function useWatchlistPanel(): UseWatchlistPanelResult {
 
   const handleInputChange = useCallback((value: string): void => {
     setInputValue(value);
+    setAddError(null);
   }, []);
 
   return {
     rows,
     inputValue,
+    isValidating,
+    addError,
     handleSelectSymbol,
     handleAddSymbol,
     handleRemoveSymbol,

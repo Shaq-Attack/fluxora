@@ -65,6 +65,8 @@ export function WatchlistPanel(): JSX.Element {
   const {
     rows,
     inputValue,
+    isValidating,
+    addError,
     handleSelectSymbol,
     handleAddSymbol,
     handleRemoveSymbol,
@@ -106,13 +108,15 @@ export function WatchlistPanel(): JSX.Element {
         />
         <button
           className="rounded border border-border-strong bg-surface-strong px-3 py-1 text-xs text-muted hover:bg-border disabled:opacity-40"
-          disabled={inputValue.trim().length === 0}
+          disabled={inputValue.trim().length === 0 || isValidating}
           onClick={handleAddSymbol}
           type="button"
         >
           Add
         </button>
       </div>
+
+      {addError !== null && <p className="mt-1 text-xs text-red-400">{addError}</p>}
     </div>
   );
 }

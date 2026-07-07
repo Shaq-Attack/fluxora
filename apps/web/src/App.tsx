@@ -11,6 +11,7 @@ import { useOrderFillToasts } from './hooks/useOrderFillToasts';
 import { reportWsLatency } from './lib/metrics';
 import { useLayoutStore } from './store/layoutStore';
 import { useMarketStore } from './store/marketStore';
+import { useWatchlistStore } from './store/watchlistStore';
 
 function App(): JSX.Element {
   const { setTickers, addTrades, setConnectionStatus, activeSymbol } = useMarketStore(
@@ -21,8 +22,10 @@ function App(): JSX.Element {
       activeSymbol: s.activeSymbol,
     })),
   );
+  const watchlist = useWatchlistStore((s) => s.watchlist);
 
   useKrakenFeed({
+    symbols: watchlist,
     onTicker: setTickers,
     onTrade: addTrades,
     onStatusChange: setConnectionStatus,
