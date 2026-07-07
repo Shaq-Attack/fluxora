@@ -66,7 +66,7 @@ export function OrderBookPanel({ symbol }: OrderBookPanelProps): JSX.Element {
           </select>
         </div>
       </div>
-      <div className="grid min-h-0 flex-1 content-start grid-cols-2 gap-px overflow-auto bg-border">
+      <div className="grid min-h-0 flex-1 grid-cols-2 gap-px overflow-auto bg-border">
         <div className="bg-surface-elevated">
           <div className="grid grid-cols-2 gap-1 px-3 py-1">
             <span className="text-xs text-dim">Price</span>
