@@ -1,6 +1,7 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useShallow } from 'zustand/react/shallow';
 import { useKrakenFeed } from '@fluxora/data';
+import logoUrl from './assets/logo.svg';
 import { ConnectionBadge } from './components/ConnectionBadge';
 import { DashboardGrid } from './components/DashboardGrid';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -48,7 +49,10 @@ function App(): JSX.Element {
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-surface text-primary">
       <header className="flex shrink-0 items-center justify-between border-b border-border bg-surface px-4 py-3">
-        <h1 className="text-lg font-semibold tracking-tight">Fluxora</h1>
+        <div className="flex items-center gap-2">
+          <img src={logoUrl} alt="" className="size-6 dark:invert" />
+          <h1 className="text-lg font-semibold tracking-tight">Fluxora</h1>
+        </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <ConnectionBadge />
