@@ -6,6 +6,7 @@ import { parseKrakenMessage } from './parser';
 const MAX_SEEN_TRADE_IDS = 1_000;
 
 interface KrakenAdapterOptions {
+  symbols: string[];
   onTicker: (tickers: Ticker[]) => void;
   onTrade: (trades: Trade[]) => void;
   onStatusChange: (status: ConnectionStatus) => void;
@@ -18,6 +19,7 @@ export class KrakenAdapter {
 
   constructor(options: KrakenAdapterOptions) {
     this.connection = new KrakenConnection({
+      symbols: options.symbols,
       onMessage: (raw) => {
         const message = parseKrakenMessage(raw);
         if (message === null || message.kind === 'ignore') return;
@@ -54,5 +56,9 @@ export class KrakenAdapter {
 
   stop(): void {
     this.connection.disconnect();
+  }
+
+  setSymbols(symbols: string[]): void {
+    this.connection.setSymbols(symbols);
   }
 }

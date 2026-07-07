@@ -1,24 +1,19 @@
 import { EXCHANGE_CONFIGS } from '@fluxora/types';
 import type { ConnectionStatus } from '@fluxora/types';
-
-const SYMBOLS = ['BTC/USD', 'ETH/USD'] as const;
-
-const SUBSCRIBE_TICKER = JSON.stringify({
-  method: 'subscribe',
-  params: { channel: 'ticker', symbol: [...SYMBOLS] },
-});
-
-const SUBSCRIBE_TRADE = JSON.stringify({
-  method: 'subscribe',
-  params: { channel: 'trade', symbol: [...SYMBOLS] },
-});
+import { diffSymbols } from './symbolDiff';
 
 const INITIAL_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 30_000;
 const JITTER_FACTOR = 0.2;
 const PING_INTERVAL_MS = 10_000;
 
+function subscriptionMessage(method: 'subscribe' | 'unsubscribe', channel: 'ticker' | 'trade', symbols: string[]): string {
+  return JSON.stringify({ method, params: { channel, symbol: symbols } });
+}
+
 export interface KrakenConnectionOptions {
+  /** Symbols to subscribe to on connect. Call setSymbols() later to change the set. */
+  symbols: string[];
   onMessage: (raw: string) => void;
   onStatusChange: (status: ConnectionStatus) => void;
   /** Optional: receives the WebSocket ping→pong round-trip time in milliseconds. */
@@ -36,9 +31,31 @@ export class KrakenConnection {
   // Maps an outstanding ping req_id to its send timestamp (performance.now()).
   private readonly pendingPings = new Map<number, number>();
   private readonly options: KrakenConnectionOptions;
+  private symbols: string[];
 
   constructor(options: KrakenConnectionOptions) {
     this.options = options;
+    this.symbols = [...options.symbols];
+  }
+
+  /**
+   * Updates the subscribed symbol set. If connected, sends unsubscribe/subscribe
+   * frames for just the delta; otherwise the new set takes effect on next connect.
+   */
+  setSymbols(next: string[]): void {
+    const { added, removed } = diffSymbols(this.symbols, next);
+    this.symbols = [...next];
+    if (added.length === 0 && removed.length === 0) return;
+    if (this.ws === null || this.ws.readyState !== WebSocket.OPEN) return;
+
+    if (removed.length > 0) {
+      this.ws.send(subscriptionMessage('unsubscribe', 'ticker', removed));
+      this.ws.send(subscriptionMessage('unsubscribe', 'trade', removed));
+    }
+    if (added.length > 0) {
+      this.ws.send(subscriptionMessage('subscribe', 'ticker', added));
+      this.ws.send(subscriptionMessage('subscribe', 'trade', added));
+    }
   }
 
   private emitStatus(status: ConnectionStatus): void {
@@ -88,8 +105,10 @@ export class KrakenConnection {
     ws.onopen = () => {
       this.backoffMs = INITIAL_BACKOFF_MS;
       this.emitStatus('connected');
-      ws.send(SUBSCRIBE_TICKER);
-      ws.send(SUBSCRIBE_TRADE);
+      if (this.symbols.length > 0) {
+        ws.send(subscriptionMessage('subscribe', 'ticker', this.symbols));
+        ws.send(subscriptionMessage('subscribe', 'trade', this.symbols));
+      }
       this.startPinging(ws);
     };
 
